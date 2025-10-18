@@ -69,7 +69,7 @@ async function getEpisodes(animeId, container) {
 data.data.episodeList.forEach(ep => {
   const epLink = document.createElement("a");
   epLink.href = `/anime/watch?id=${ep.episodeId}`; // tetap sebagai href
-  epLink.className = "text-start bg-white inline-block text-purple-800 text-sm md:text-lg px-3 py-1 rounded mr-2 mb-1 hover:bg-purple-100 transition";
+  epLink.className = "text-start bg-white inline-block text-purple-800 text-sm md:text-lg px-3 py-1 rounded mr-2 mb-1 shadow hover:bg-purple-100 transition";
   epLink.innerText = `Episode: ${ep.title || ep.episodeNumber}`;
 
   // Tangani klik supaya SPA tidak reload
@@ -114,4 +114,5 @@ export function detail() {
     </div>
   `;
 }
+
 
