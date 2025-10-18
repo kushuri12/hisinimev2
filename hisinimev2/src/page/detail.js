@@ -110,10 +110,11 @@ export function detail() {
     <div id="information" class="relative w-full md:w-[100vh] flex flex-col md:flex-row items-center md:items-stretch bg-white rounded shadow md:mt-5 p-2">
       Sedang memuat konten...
     </div>
-    <div id="episode" class="w-full md:w-[100vh] flex flex-col justify-center bg-white rounded shadow mt-5 pt-3 gap-3">
+    <div id="episode" class="w-full md:w-[100vh] flex flex-col justify-center rounded shadow mt-5 pt-3 gap-3">
     </div>
   `;
 }
+
 
 
 
