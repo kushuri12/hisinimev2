@@ -54,7 +54,7 @@ async function getDetailAnime(id, container) {
   }
 }
 
-// Fungsi untuk menampilkan daftar episode
+// Fungsi untuk menampilkan daftar episode yang lebih menarik
 async function getEpisodes(animeId, container) {
   try {
     const res = await fetch(`${base_api}samehadaku/anime/${animeId}`);
@@ -66,20 +66,34 @@ async function getEpisodes(animeId, container) {
     }
 
     container.innerHTML = "";
-data.data.episodeList.forEach(ep => {
-  const epLink = document.createElement("a");
-  epLink.href = `/anime/watch?id=${ep.episodeId}`; // tetap sebagai href
-  epLink.className = "text-start bg-white inline-block text-purple-800 text-sm md:text-lg px-3 py-1 rounded mr-2 mb-1 hover:bg-purple-100 transition";
-  epLink.innerText = `Episode: ${ep.title || ep.episodeNumber}`;
+    
+    // Container grid
+    const grid = document.createElement("div");
+    grid.className = "grid grid-cols-2 md:grid-cols-4 gap-3";
 
-  // Tangani klik supaya SPA tidak reload
-  epLink.addEventListener("click", (e) => {
-    e.preventDefault();           // cegah reload
-    navigateTo(`/anime/watch?id=${ep.episodeId}`);
-  });
+    data.data.episodeList.forEach(ep => {
+      const epCard = document.createElement("a");
+      epCard.href = `/anime/watch?id=${ep.episodeId}`;
+      epCard.className = `
+        block p-3 bg-white rounded-lg shadow hover:shadow-lg
+        transition transform hover:-translate-y-1 hover:bg-purple-50
+        text-purple-800 text-sm md:text-base
+      `;
+      epCard.innerHTML = `
+        <div class="font-semibold">Episode ${ep.episodeNumber}</div>
+        <div class="text-xs text-gray-500">${ep.title || ""}</div>
+      `;
 
-  container.appendChild(epLink);
-});
+      // Tangani klik supaya SPA tidak reload
+      epCard.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateTo(`/anime/watch?id=${ep.episodeId}`);
+      });
+
+      grid.appendChild(epCard);
+    });
+
+    container.appendChild(grid);
 
   } catch (err) {
     console.error(err);
@@ -114,6 +128,7 @@ export function detail() {
     </div>
   `;
 }
+
 
 
 
