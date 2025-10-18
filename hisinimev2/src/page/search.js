@@ -50,8 +50,9 @@ export function search() {
 
   return `
   <a class="absolute left-1 top-1 bg-gray-100 text-center p-2 mr-2 rounded text-purple-500 hover:bg-purple-100 transition" href="#" id="backto">Kembali</a>
-    <div id="srch" class="flex flex-col gap-4 justify-center items-center p-5 min-h-screen bg-gray-50">
+    <div id="srch" class="flex flex-col gap-4 items-center p-5 min-h-screen bg-gray-50">
       <p class="text-gray-400 text-center">Sedang memuat pencarian...</p>
     </div>
   `;
 }
+
