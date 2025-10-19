@@ -42,10 +42,11 @@ function displayAnime(animeList, targetId) {
     const card = document.createElement("div");
     card.className = `
       min-w-[150px] max-w-[150px] bg-white rounded-lg shadow-md p-3 
-      snap-start flex flex-col hover:shadow-lg transition-shadow
+      snap-start flex flex-col hover:shadow-lg transition-shadow relative
     `;
     card.innerHTML = `
       <img src="${anime.poster}" alt="${anime.title}" class="w-full h-auto rounded mb-3 object-cover" />
+          <span class="absolute top-2 right-2 rounded-full bg-purple-500 text-white text-[10px] p-1 font-semibold">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>
       <div class="flex flex-col items-start">
         <h3 class="font-bold text-sm mb-1 line-clamp-2">${anime.title}</h3>
       </div>

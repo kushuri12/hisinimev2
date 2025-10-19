@@ -36,11 +36,12 @@ export function search() {
         card.className = `
           bg-white rounded-lg shadow-md overflow-hidden cursor-pointer
           hover:shadow-lg hover:-translate-y-1 transition-all duration-200
-          flex flex-col
+          flex flex-col relative
         `;
         card.innerHTML = `
           <img src="${anime.poster}" alt="${anime.title}" 
             class="w-full aspect-[3/4] object-cover"/>
+            <span class="absolute top-2 right-2 rounded-full bg-purple-500 text-white text-[10px] p-1 font-semibold">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>
           <div class="p-2 flex flex-col flex-grow">
             <h3 class="text-purple-800 font-semibold text-sm text-center line-clamp-2">
               ${anime.title}
