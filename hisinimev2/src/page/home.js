@@ -85,41 +85,57 @@ export function home() {
 
     document.title = "HisiNime v2";
 
-    // Ambil elemen search setelah HTML ada di DOM
+    // Ambil elemen search & navbar setelah HTML ada di DOM
     const searchInput = document.getElementById("input-btn");
     const searchBtn = document.getElementById("search-btn");
+    const navHome = document.getElementById("navHome");
+    const navFav = document.getElementById("navFav");
 
-    searchBtn.addEventListener("click", (e) => {
-      e.preventDefault(); // supaya link <a> tidak reload page
+    // Listener search
+    const doSearch = () => {
       const query = searchInput.value.trim();
       if (!query) return;
-
       navigateTo(`/anime/search?q=${encodeURIComponent(query)}`);
+    };
+
+    searchBtn.addEventListener("click", e => {
+      e.preventDefault();
+      doSearch();
     });
 
-    // Optional: tekan Enter juga bisa search
-    searchInput.addEventListener("keypress", (e) => {
+    searchInput.addEventListener("keypress", e => {
       if (e.key === "Enter") {
         e.preventDefault();
-        const query = searchInput.value.trim();
-        if (!query) return;
-        navigateTo(`/anime/search?q=${encodeURIComponent(query)}`);
+        doSearch();
       }
+    });
+
+    // Listener navbar
+    navHome.addEventListener("click", e => {
+      e.preventDefault();
+      navigateTo(`/`);
+    });
+
+    navFav.addEventListener("click", e => {
+      e.preventDefault();
+      navigateTo(`/anime/favorite`);
     });
 
   }, 0);
 
   return `
-    <div class="flex justify-between w-screen p-2 pl-5 bg-white shadow rounded">
-      <h1 class="text-purple-800 font-bold">HisiNime v2</h1>
-      <div class="pl-1 pr-1 rounded bg-gray-100">
+    <div class="flex justify-between items-center w-screen p-2 pl-5 bg-white shadow rounded">
+      <div class="flex gap-4 items-center">
+        <h1 class="text-purple-800 font-bold">HisiNime v2</h1>
+      </div>
+      <div class="pl-1 pr-1 rounded bg-gray-100 flex items-center gap-1">
         <input
           id="input-btn"
-          class="bg-gray-100 focus:outline-none"
+          class="bg-gray-100 focus:outline-none px-2"
           type="text"
           placeholder="Cari anime..."
         />
-        <a id="search-btn" class="text-purple-500" href="">Cari</a>
+        <a id="search-btn" class="text-purple-500 px-2" href="#">Cari</a>
       </div>
     </div>
 

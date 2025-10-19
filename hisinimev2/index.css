@@ -1,0 +1,6 @@
+#synopsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* jumlah baris awal sebelum dipotong */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -23,15 +23,19 @@ async function getDetailAnime(id, container) {
     <a class="absolute left-1 top-1 bg-gray-100 text-center p-2 rounded text-purple-500 hover:bg-purple-100 transition" href="#" id="backto">Kembali</a>
       <img src="${anime.poster}" alt="${
       anime.japanese
-    }" class="object-cover w-[30vh] md:w-[50vh] rounded-md mb-5 md:mb-0 md:mr-5"/>
+    }" class="object-cover w-[30vh] md:w-[50vh] rounded-md mb-5 md:mb-0 mx-auto md:mx-0 md:mr-5"/>
       <div class="flex flex-col flex-grow">
         <h1 class="font-bold text-md">${anime?.synonyms || anime.japanese}</h1>
         <h1 class="text-sm mt-1">${anime.english}</h1>
-        <p class="mt-4 text-justify text-sm leading-relaxed max-w-full md:max-w-[600px]">
-          <span class="font-semibold">Sinopsis:</span> ${anime.synopsis.paragraphs.join(
-            "<br><br>"
-          )}
-        </p>
+        <div class="mt-4 text-justify text-sm leading-relaxed max-w-full md:max-w-[600px]">
+  <p id="synopsis">
+    <span class="font-semibold">Sinopsis:</span> ${anime.synopsis.paragraphs.join(
+      "<br><br>"
+    )}
+  </p>
+  <button id="readMoreBtn" class="text-purple-600 hover:underline">Selengkapnya</button>
+</div>
+
         <div class="bg-gray-100 p-2 mt-2 mb-2">
           <p class="text-xs text-black mb-1">Japanese: ${anime.japanese}</p>
           <p class="text-xs text-black mb-1">Status: ${anime.status}</p>
@@ -53,6 +57,22 @@ async function getDetailAnime(id, container) {
         </div>
       </div>
     `;
+
+    const synopsis = document.getElementById("synopsis");
+    const btn = document.getElementById("readMoreBtn");
+
+    let expanded = false;
+
+    btn.addEventListener("click", () => {
+      expanded = !expanded;
+      if (expanded) {
+        synopsis.style.webkitLineClamp = "unset"; // tampilkan semua teks
+        btn.innerText = "Sembunyikan";
+      } else {
+        synopsis.style.webkitLineClamp = 2; // potong lagi
+        btn.innerText = "Selengkapnya";
+      }
+    }); 
 
     document.getElementById("backto").addEventListener("click", () => {
       window.history.back();
@@ -138,12 +158,9 @@ export function detail() {
 
   // Kembalikan HTML placeholder
   return `
-  <div class="flex flex-col md:flex-row">
-    <div id="information" class="relative min-w-screen max-w-screen md:w-[100vh] flex flex-col md:flex-row items-center md:items-stretch bg-white rounded shadow md:mt-5 p-2">
-      Sedang memuat konten...
-    </div>
-    <div id="episode" class="min-w-screen max-w-screen md:w-[100vh] flex flex-col justify-center bg-white rounded shadow mt-5 pt-3">
-    </div>
-    </div>
+  <div class="flex flex-col md:flex-row w-screen">
+  <div id="information" class="w-screen bg-white p-4">Sedang memuat konten...</div>
+  <div id="episode" class="w-screen bg-white p-4">Sedang memuat konten...</div>
+</div>
   `;
 }
