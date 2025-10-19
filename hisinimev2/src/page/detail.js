@@ -142,7 +142,7 @@ async function getEpisodes(animeId, container) {
       class="object-cover w-[100px] h-[50px] rounded-md mr-3"
     />
     <div class="flex flex-col">
-    <span class="truncate">${ep.episode}</span>
+    <span class="">${ep.episode}</span>
   <span class="text-xs md:text-sm whitespace-nowrap">${anime.duration}</span>
   </div>
   </div>
