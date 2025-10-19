@@ -49,7 +49,7 @@ export function search() {
           </div>
         `;
         card.addEventListener("click", () => {
-          navigateTo(`/anime/detail?id=${anime.slug}`);
+          navigateTo(`/anime/detail?id=${anime.batch.slug}`);
         });
         resultsContainer.appendChild(card);
       });
