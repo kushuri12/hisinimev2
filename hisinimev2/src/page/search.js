@@ -35,7 +35,7 @@ export function search() {
         const url = anime.slug;
         const match = url.match(/\/anime\/(.+)/);
         const slug = match ? match[1] : null;
-
+        
         const card = document.createElement("div");
         card.className = `
       min-w-[200px] max-w-[200px] bg-white rounded-lg shadow-md 
