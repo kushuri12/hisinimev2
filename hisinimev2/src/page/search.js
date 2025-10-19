@@ -8,7 +8,7 @@ export function search() {
     const container = document.getElementById("srch");
     container.innerHTML = `
       <div class="w-full flex flex-col items-center mb-6">
-        <h2 class="text-purple-800 font-extrabold text-2xl text-center mb-1">
+        <h2 class="text-purple-500 font-bold text-2xl text-center mb-1">
           Hasil Pencarian
         </h2>
         <p class="text-gray-500 text-center text-sm">

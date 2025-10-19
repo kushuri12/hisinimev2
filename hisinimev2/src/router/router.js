@@ -2,12 +2,14 @@ import { home } from '../page/home.js';
 import { watch } from '../page/watch.js';
 import { detail } from '../page/detail.js';
 import { search } from '../page/search.js';
+import { favorite } from '../page/favorite.js';
 
 const routes = {
     "/": home,
     "/anime/watch": watch,
     "/anime/detail": detail,
     "/anime/search": search,
+    "/anime/favorite": favorite,
 };
 
 export function navigateTo(path) {

@@ -1,3 +1,5 @@
+import { addFavorite, removeFavorite, getFavorites } from '../storage/storage.js';
+
 const base_api = "https://www.sankavollerei.com/anime/";
 
 // Ambil ID anime dari URL query
@@ -19,6 +21,8 @@ async function getDetailAnime(id, container) {
 
     const anime = data.data;
 
+    const isFavorited = getFavorites().includes(id);
+
     container.innerHTML = `
     <a class="absolute left-1 top-1 bg-gray-100 text-center p-2 rounded text-purple-500 hover:bg-purple-100 transition" href="#" id="backto">Kembali</a>
       <img src="${anime.poster}" alt="${
@@ -27,6 +31,9 @@ async function getDetailAnime(id, container) {
       <div class="flex flex-col flex-grow">
         <h1 class="font-bold text-md">${anime?.synonyms || anime.japanese}</h1>
         <h1 class="text-sm mt-1">${anime.english}</h1>
+         <button id="favoriteBtn" class="mt-2 px-3 py-1 w-[130px] rounded text-sm ${isFavorited ? 'bg-red-500 text-white' : 'bg-purple-500 text-white'} hover:opacity-80 transition">
+          ${isFavorited ? 'Hapus Favorit' : 'Tambah Favorit'}
+        </button>
         <div class="mt-4 text-justify text-sm leading-relaxed max-w-full md:max-w-[600px]">
   <p id="synopsis">
     <span class="font-semibold">Sinopsis:</span> ${anime.synopsis.paragraphs.join(
@@ -76,6 +83,21 @@ async function getDetailAnime(id, container) {
 
     document.getElementById("backto").addEventListener("click", () => {
       window.history.back();
+    });
+
+    // Event listener untuk tombol favorite
+    document.getElementById("favoriteBtn").addEventListener("click", () => {
+      const btn = document.getElementById("favoriteBtn");
+      const isFavorited = getFavorites().includes(id);
+      if (isFavorited) {
+        removeFavorite(id);
+        btn.textContent = "Tambah Favorit";
+        btn.className = "mt-2 px-3 py-1 w-[130px] rounded text-sm bg-purple-500 text-white hover:opacity-80 transition";
+      } else {
+        addFavorite(id);
+        btn.textContent = "Hapus Favorit";
+        btn.className = "mt-2 px-3 py-1 w-[130px] rounded text-sm bg-red-500 text-white hover:opacity-80 transition";
+      }
     });
   } catch (err) {
     console.error(err);

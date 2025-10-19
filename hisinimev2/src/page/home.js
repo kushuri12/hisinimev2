@@ -88,8 +88,7 @@ export function home() {
     // Ambil elemen search & navbar setelah HTML ada di DOM
     const searchInput = document.getElementById("input-btn");
     const searchBtn = document.getElementById("search-btn");
-    const navHome = document.getElementById("navHome");
-    const navFav = document.getElementById("navFav");
+    const goToFav = document.getElementById("goToFavorite");
 
     // Listener search
     const doSearch = () => {
@@ -111,12 +110,7 @@ export function home() {
     });
 
     // Listener navbar
-    navHome.addEventListener("click", e => {
-      e.preventDefault();
-      navigateTo(`/`);
-    });
-
-    navFav.addEventListener("click", e => {
+    goToFav.addEventListener("click", e => {
       e.preventDefault();
       navigateTo(`/anime/favorite`);
     });
@@ -124,8 +118,8 @@ export function home() {
   }, 0);
 
   return `
-    <div class="flex justify-between items-center w-screen p-2 pl-5 bg-white shadow rounded">
-      <div class="flex gap-4 items-center">
+    <div class="flex justify-between items-center w-screen p-2 pl-3 bg-white shadow rounded">
+      <div class="flex flex-col gap-4 items-center">
         <h1 class="text-purple-800 font-bold">HisiNime v2</h1>
       </div>
       <div class="pl-1 pr-1 rounded bg-gray-100 flex items-center gap-1">
@@ -138,6 +132,10 @@ export function home() {
         <a id="search-btn" class="text-purple-500 px-2" href="#">Cari</a>
       </div>
     </div>
+
+    <div class="flex flex-col gap-4 mt-3 bg-white w-full md:w-[100vh] items-center p-2 rounded shadow">
+        <a class="text-purple-500 text-sm font-semibold" href="/" id="goToFavorite">Favorite</a>
+      </div>
 
     <div class="p-2 bg-white mt-5 rounded-tr-md rounded-tl-md w-full md:w-[100vh] font-semibold text-purple-500">Sudah Tamat</div>
     <div id="card-completed" class="p-2 bg-white rounded-br-md rounded-bl-md w-full md:w-[100vh] flex overflow-x-auto gap-2">Sedang memuat konten...</div>
