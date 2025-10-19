@@ -32,24 +32,28 @@ export function search() {
       }
 
       results.forEach((anime) => {
+        const url = anime.slug;
+        const match = url.match(/\/anime\/(.+)/);
+        const slug = match ? match[1] : null;
+
         const card = document.createElement("div");
         card.className = `
-          bg-white rounded-lg shadow-md overflow-hidden cursor-pointer
-          hover:shadow-lg hover:-translate-y-1 transition-all duration-200
-          flex flex-col relative
-        `;
+      min-w-[200px] max-w-[200px] bg-white rounded-lg shadow-md 
+      snap-start flex flex-col hover:shadow-lg transition-shadow relative
+    `;
         card.innerHTML = `
-          <img src="${anime.poster}" alt="${anime.title}" 
-            class="w-full aspect-[3/4] object-cover"/>
-            <span class="absolute top-2 right-2 rounded-full bg-purple-500 text-white text-[10px] p-1 font-semibold">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>
-          <div class="p-2 flex flex-col flex-grow">
-            <h3 class="text-purple-800 font-semibold text-sm text-center line-clamp-2">
-              ${anime.title}
-            </h3>
-          </div>
-        `;
+      <img src="${anime.poster}" alt="${
+          anime.title
+        }" class="w-full h-auto rounded mb-3 object-cover" />
+          <span class="absolute top-2 right-2 rounded-full bg-purple-500 text-white text-[12px] p-2 font-semibold">Episode ${
+            anime.episode_count !== undefined ? anime.episode_count : "?"
+          }</span>
+      <div class="flex flex-col items-start pl-3 pr-3">
+        <h3 class="font-bold text-sm mb-1 line-clamp-2">${anime.title}</h3>
+      </div>
+    `;
         card.addEventListener("click", () => {
-          navigateTo(`/anime/detail?id=${anime.slug}`);
+          navigateTo(`/anime/detail?id=${slug}`);
         });
         resultsContainer.appendChild(card);
       });
