@@ -32,6 +32,10 @@ export function search() {
       }
 
       results.forEach((anime) => {
+        const url = anime.slug;
+        const match = url.match(/\/anime\/(.+)/);
+        const slug = match ? match[1] : null;
+        
         const card = document.createElement("div");
         card.className = `
           bg-white rounded-lg shadow-md overflow-hidden cursor-pointer
@@ -49,7 +53,7 @@ export function search() {
           </div>
         `;
         card.addEventListener("click", () => {
-          navigateTo(`/anime/detail?id=${anime.slug}`);
+          navigateTo(`/anime/detail?id=${slug}`);
         });
         resultsContainer.appendChild(card);
       });
