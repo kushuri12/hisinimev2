@@ -31,7 +31,7 @@ export function search() {
         return;
       }
 
-      results.forEach((anime) => {
+      search_results.forEach((anime) => {
         const card = document.createElement("div");
         card.className = `
           bg-white rounded-lg shadow-md overflow-hidden cursor-pointer
