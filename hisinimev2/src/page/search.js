@@ -19,9 +19,9 @@ export function search() {
     `;
 
     try {
-      const res = await fetch(`${API}samehadaku/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`${API}search/${encodeURIComponent(query)}`);
       const data = await res.json();
-      const results = data?.data?.animeList || [];
+      const results = data?.search_results || [];
       const resultsContainer = document.getElementById("results");
 
       if (!results.length) {
@@ -48,7 +48,7 @@ export function search() {
           </div>
         `;
         card.addEventListener("click", () => {
-          navigateTo(`/anime/detail?id=${anime.animeId}`);
+          navigateTo(`/anime/detail?id=${anime.slug}`);
         });
         resultsContainer.appendChild(card);
       });
@@ -58,23 +58,17 @@ export function search() {
         <p class="text-red-500 text-center w-full">Gagal mengambil hasil pencarian.</p>
       `;
     }
-
-    // tombol kembali
-    document.getElementById("backto").addEventListener("click", (e) => {
-      e.preventDefault();
-      window.history.back();
-    });
   }, 0);
 
   return `
     <div class="w-full flex justify-start p-4 bg-white shadow-sm z-10">
-      <a 
-        href="" 
+      <button
+      onclick="window.history.back()"
         id="backto" 
         class="bg-purple-100 text-purple-700 px-4 py-2 rounded font-semibold hover:bg-purple-200 transition"
-      >Kembali</a>
+      >Kembali</button>
     </div>
-    <div id="srch" class="flex flex-col items-center p-5 min-h-screen bg-gray-50">
+    <div id="srch" class="flex flex-col items-center p-5 mt-3 bg-white rounded shadow">
       <p class="text-gray-400 text-center">Sedang memuat pencarian...</p>
     </div>
   `;

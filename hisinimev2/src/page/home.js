@@ -2,10 +2,10 @@ const url_api = "https://www.sankavollerei.com/anime/";
 
 async function home_anime() {
   try {
-    const res = await fetch(`${url_api}samehadaku/completed`);
+    const res = await fetch(`${url_api}complete-anime/1`);
     const data = await res.json();
-    if (data?.data?.animeList) {
-      displayAnime(data.data.animeList, "card-completed");
+    if (data?.data?.completeAnimeData) {
+      displayAnime(data.data.completeAnimeData, "card-completed");
     } else {
       document.getElementById("card-completed").innerText =
         "Data anime tidak ditemukan.";
@@ -19,10 +19,10 @@ async function home_anime() {
 
 async function home_anime2() {
   try {
-    const res = await fetch(`${url_api}samehadaku/ongoing`);
+    const res = await fetch(`${url_api}ongoing-anime`);
     const data = await res.json();
-    if (data?.data?.animeList) {
-      displayAnime(data.data.animeList, "card-ongoing");
+    if (data?.data?.ongoingAnimeData) {
+      displayAnime(data.data.ongoingAnimeData, "card-ongoing");
     } else {
       document.getElementById("card-ongoing").innerText =
         "Data anime tidak ditemukan.";
@@ -30,23 +30,6 @@ async function home_anime2() {
   } catch (err) {
     console.error("Gagal mengambil data ongoing:", err);
     document.getElementById("card-ongoing").innerText =
-      "Gagal mengambil data anime.";
-  }
-}
-
-async function home_movie() {
-  try {
-    const res = await fetch(`${url_api}samehadaku/movies`);
-    const data = await res.json();
-    if (data?.data?.animeList) {
-      displayAnime(data.data.animeList, "card-movies");
-    } else {
-      document.getElementById("card-movies").innerText =
-        "Data anime tidak ditemukan.";
-    }
-  } catch (err) {
-    console.error("Gagal mengambil data movies:", err);
-    document.getElementById("card-movies").innerText =
       "Gagal mengambil data anime.";
   }
 }
@@ -69,7 +52,7 @@ function displayAnime(animeList, targetId) {
     `;
 
     card.addEventListener("click", () => {
-      navigateTo(`/anime/detail?id=${anime.animeId}`);
+      navigateTo(`/anime/detail?id=${anime.slug}`);
     });
 
     grid.appendChild(card);
@@ -81,7 +64,6 @@ export function home() {
     // Load anime
     home_anime();
     home_anime2();
-    home_movie();
 
     document.title = "HisiNime v2";
 
@@ -142,8 +124,5 @@ export function home() {
 
     <div class="p-2 bg-white mt-5 rounded-tr-md rounded-tl-md w-full md:w-[100vh] font-semibold text-purple-500">Sedang Tayang</div>
     <div id="card-ongoing" class="p-2 bg-white rounded-br-md rounded-bl-md w-full md:w-[100vh] flex overflow-x-auto gap-2">Sedang memuat konten...</div>
-
-    <div class="p-2 bg-white mt-5 rounded-tr-md rounded-tl-md w-full md:w-[100vh] font-semibold text-purple-500">Movie</div>
-    <div id="card-movies" class="p-2 bg-white rounded-br-md rounded-bl-md w-full md:w-[100vh] flex overflow-x-auto gap-2">Sedang memuat konten...</div>
   `;
 }

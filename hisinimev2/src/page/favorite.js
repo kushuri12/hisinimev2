@@ -1,10 +1,11 @@
 // js/favorite.js
-import { getFavorites, removeFavorite } from '../storage/storage.js';
+import { getFavorites } from '../storage/storage.js';
 
 export function favorite() {
   setTimeout(async () => {
     const container = document.getElementById("favorites");
     await renderFavorites(container, navigateTo);
+    document.title = "Favorite"
 
     // tombol kembali
     document.getElementById("backto").addEventListener("click", (e) => {
@@ -45,7 +46,7 @@ async function renderFavorites(container, navigateTo) {
   for (let id of favs) {
     try {
       // Fetch data anime sesuai ID
-      const res = await fetch(`https://www.sankavollerei.com/anime/samehadaku/anime/${encodeURIComponent(id)}`);
+      const res = await fetch(`https://www.sankavollerei.com/anime/anime/${encodeURIComponent(id)}`);
       const json = await res.json();
 
       if (!json.data) {
@@ -57,7 +58,7 @@ async function renderFavorites(container, navigateTo) {
 
       // Buat list item
       const li = document.createElement('li');
-      li.className = 'flex items-center justify-between bg-white border border-purple-300 px-3 py-2 rounded hover:bg-purple-100 transition';
+      li.className = 'flex items-center justify-between bg-white border border-purple-300 px-3 py-2 rounded hover:bg-purple-100 transition cursor-pointer';
 
       // Konten anime
       const infoDiv = document.createElement('div');
@@ -66,36 +67,22 @@ async function renderFavorites(container, navigateTo) {
       img.src = data.poster;
       img.width = 50;
       img.className = 'rounded-md';
-      const span = document.createElement('span');
-      span.textContent = data.synonyms || data.japanese;
+      const textDiv = document.createElement('div');
+      textDiv.className = 'flex flex-col';
+      const titleSpan = document.createElement('span');
+      titleSpan.textContent = data.title;
+      const episodeSpan = document.createElement('span');
+      episodeSpan.textContent = `Episode: ${data.episode_count}`;
+      episodeSpan.className = 'text-sm text-gray-500';
 
+      textDiv.appendChild(titleSpan);
+      textDiv.appendChild(episodeSpan);
       infoDiv.appendChild(img);
-      infoDiv.appendChild(span);
-
-      // Tombol Hapus
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = 'Hapus';
-      removeBtn.className = 'bg-red-500 text-white px-2 py-1 rounded text-xs';
-      removeBtn.onclick = () => {
-        removeFavorite(id);
-        renderFavorites(container, navigateTo);
-      };
-
-      // Tombol Detail
-      const detailBtn = document.createElement('button');
-      detailBtn.textContent = 'Detail';
-      detailBtn.className = 'bg-purple-500 text-white px-2 py-1 rounded text-xs';
-      detailBtn.onclick = () => navigateTo(`/anime/detail?id=${id}`);
-
-      // Container tombol
-      const btnContainer = document.createElement('div');
-      btnContainer.className = 'flex gap-2';
-      btnContainer.appendChild(detailBtn);
-      btnContainer.appendChild(removeBtn);
+      infoDiv.appendChild(textDiv);
 
       // Gabungkan semuanya
       li.appendChild(infoDiv);
-      li.appendChild(btnContainer);
+      li.onclick = () => navigateTo(`/anime/detail?id=${id}`);
       ul.appendChild(li);
 
     } catch (err) {

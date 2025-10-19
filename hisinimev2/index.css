@@ -4,3 +4,10 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.truncate {
+  white-space: nowrap;       /* teks tetap satu baris */
+  overflow: hidden;          /* sembunyikan yang melebihi */
+  text-overflow: ellipsis;   /* ganti sisa dengan "..." */
+  max-width: 200px;          /* sesuaikan lebar */
+}
