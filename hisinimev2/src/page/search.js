@@ -31,7 +31,7 @@ export function search() {
         return;
       }
 
-      search_results.forEach((anime) => {
+      results.forEach((anime) => {
         const card = document.createElement("div");
         card.className = `
           bg-white rounded-lg shadow-md overflow-hidden cursor-pointer
@@ -49,7 +49,7 @@ export function search() {
           </div>
         `;
         card.addEventListener("click", () => {
-          navigateTo(`/anime/detail?id=${anime.batch.slug}`);
+          navigateTo(`/anime/detail?id=${anime.slug}`);
         });
         resultsContainer.appendChild(card);
       });
