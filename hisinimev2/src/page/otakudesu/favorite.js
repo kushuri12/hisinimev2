@@ -1,11 +1,11 @@
 // js/favorite.js
-import { getFavorites } from '../storage/storage.js';
+import { getFavorites } from '../../storage/storage.js';
 
 export function favorite() {
   setTimeout(async () => {
     const container = document.getElementById("favorites");
     await renderFavorites(container, navigateTo);
-    document.title = "Favorite"
+    document.title = "Favorite - OtakuDesu Mode"
 
     // tombol kembali
     document.getElementById("backto").addEventListener("click", (e) => {
@@ -15,27 +15,27 @@ export function favorite() {
   }, 0);
 
   return `
-    <div class="w-full flex justify-start p-4 bg-white shadow-sm z-10">
+    <div class="w-full flex justify-start p-4 bg-gray-900 shadow-sm z-10">
       <a
         href=""
         id="backto"
-        class="bg-purple-100 text-purple-700 px-4 py-2 rounded font-semibold hover:bg-purple-200 transition"
+        class="bg-gray-700 text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"
       >Kembali</a>
     </div>
-    <div id="favorites" class="mt-3 rounded shadow flex flex-col items-center p-5 w-full md:w-[100vh] bg-white">
-      <p class="text-gray-400 text-center">Sedang memuat favorit...</p>
+    <div id="favorites" class="mt-3 rounded shadow flex flex-col items-center p-5 w-full md:w-[100vh] bg-gray-900">
+      <p class="text-gray-300 text-center">Sedang memuat favorit...</p>
     </div>
   `;
 }
 
 async function renderFavorites(container, navigateTo) {
   // Bersihkan container
-  container.innerHTML = '<h2 class="text-xl text-purple-500 font-bold mb-4">Daftar Favorit</h2>';
+  container.innerHTML = '<h2 class="text-xl text-purple-300 font-bold mb-4">Daftar Favorit (OtakuDesu)</h2>';
 
   const favs = getFavorites();
 
   if (!favs || favs.length === 0) {
-    container.innerHTML += '<p>Belum ada anime favorit.</p>';
+    container.innerHTML += '<p class="text-gray-300">Belum ada anime favorit.</p>';
     return;
   }
 
@@ -46,19 +46,19 @@ async function renderFavorites(container, navigateTo) {
   for (let id of favs) {
     try {
       // Fetch data anime sesuai ID
-      const res = await fetch(`https://www.sankavollerei.com/anime/anime/${encodeURIComponent(id)}`);
-      const json = await res.json();
+      const { fetchFromSource } = await import('../../api.js');
+      const result = await fetchFromSource("OtakuDesu", `anime/${encodeURIComponent(id)}`);
 
-      if (!json.data) {
+      if (!result.data) {
         console.warn('Data anime tidak ditemukan:', id);
         continue;
       }
 
-      const data = json.data;
+      const data = result.data;
 
       // Buat list item
       const li = document.createElement('li');
-      li.className = 'flex items-center justify-between bg-white border border-purple-300 px-3 py-2 rounded hover:bg-purple-100 transition cursor-pointer';
+      li.className = 'flex items-center justify-between bg-gray-800 border border-purple-600 px-3 py-2 rounded hover:bg-gray-700 transition cursor-pointer';
 
       // Konten anime
       const infoDiv = document.createElement('div');
@@ -71,9 +71,10 @@ async function renderFavorites(container, navigateTo) {
       textDiv.className = 'flex flex-col';
       const titleSpan = document.createElement('span');
       titleSpan.textContent = data.title;
+      titleSpan.className = 'text-white';
       const episodeSpan = document.createElement('span');
       episodeSpan.textContent = `Episode: ${data.episode_count}`;
-      episodeSpan.className = 'text-sm text-gray-500';
+      episodeSpan.className = 'text-sm text-gray-300';
 
       textDiv.appendChild(titleSpan);
       textDiv.appendChild(episodeSpan);
@@ -82,7 +83,7 @@ async function renderFavorites(container, navigateTo) {
 
       // Gabungkan semuanya
       li.appendChild(infoDiv);
-      li.onclick = () => navigateTo(`/anime/detail?id=${id}`);
+      li.onclick = () => navigateTo(`/anime/otakudesu/detail?id=${id}`);
       ul.appendChild(li);
 
     } catch (err) {

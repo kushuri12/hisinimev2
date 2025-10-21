@@ -1,4 +1,4 @@
-const API = "https://www.sankavollerei.com/anime/";
+import { fetchFromSource } from '../../api.js';
 
 export function search() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -8,25 +8,24 @@ export function search() {
     const container = document.getElementById("srch");
     container.innerHTML = `
       <div class="w-full flex flex-col items-center mb-6">
-        <h2 class="text-purple-500 font-bold text-2xl text-center mb-1">
-          Hasil Pencarian
+        <h2 class="text-purple-300 font-bold text-2xl text-center mb-1">
+          Hasil Pencarian (OtakuDesu)
         </h2>
-        <p class="text-gray-500 text-center text-sm">
-          “${query}”
+        <p class="text-gray-300 text-center text-sm">
+          "${query}"
         </p>
       </div>
       <div id="results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full max-w-7xl"></div>
     `;
 
     try {
-      const res = await fetch(`${API}search/${encodeURIComponent(query)}`);
-      const data = await res.json();
-      const results = data?.search_results || [];
+      const result = await fetchFromSource("OtakuDesu", `search/${encodeURIComponent(query)}`);
+      const results = result?.data?.search_results || [];
       const resultsContainer = document.getElementById("results");
 
       if (!results.length) {
         resultsContainer.innerHTML = `
-          <p class="text-gray-500 text-center col-span-full">Tidak ada hasil ditemukan.</p>
+          <p class="text-gray-300 text-center col-span-full">Tidak ada hasil ditemukan.</p>
         `;
         return;
       }
@@ -35,46 +34,47 @@ export function search() {
         const url = anime.slug;
         const match = url.match(/\/anime\/(.+)/);
         const slug = match ? match[1] : null;
-        
+
         const card = document.createElement("div");
         card.className = `
-      min-w-[200px] max-w-[200px] bg-white rounded-lg shadow-md 
+      min-w-[150px] max-w-[150px] bg-gray-800 rounded-lg shadow-md
       snap-start flex flex-col hover:shadow-lg transition-shadow relative
     `;
         card.innerHTML = `
       <img src="${anime.poster}" alt="${
           anime.title
         }" class="w-full h-auto rounded mb-3 object-cover" />
-          <span class="absolute top-2 right-2 rounded-full bg-purple-500 text-white text-[12px] p-2 font-semibold">Episode ${
+          <span class="absolute top-2 right-2 rounded-full bg-purple-600 text-white text-[12px] p-2 font-semibold">Episode ${
             anime.episode_count !== undefined ? anime.episode_count : "?"
           }</span>
       <div class="flex flex-col items-start pl-3 pr-3">
-        <h3 class="font-bold text-sm mb-1 line-clamp-2">${anime.title}</h3>
+        <h3 class="font-bold text-white text-sm mb-1 line-clamp-2">${anime.title}</h3>
+        <span class="text-xs text-gray-300">From ${result.source}</span>
       </div>
     `;
         card.addEventListener("click", () => {
-          navigateTo(`/anime/detail?id=${slug}`);
+          navigateTo(`/anime/otakudesu/detail?id=${slug}`);
         });
         resultsContainer.appendChild(card);
       });
     } catch (err) {
       console.error(err);
       container.innerHTML = `
-        <p class="text-red-500 text-center w-full">Gagal mengambil hasil pencarian.</p>
+        <p class="text-red-400 text-center w-full">Gagal mengambil hasil pencarian.</p>
       `;
     }
   }, 0);
 
   return `
-    <div class="w-full flex justify-start p-4 bg-white shadow-sm z-10">
+    <div class="w-full flex justify-start p-4 bg-gray-900 shadow-sm z-10">
       <button
       onclick="window.history.back()"
-        id="backto" 
-        class="bg-purple-100 text-purple-700 px-4 py-2 rounded font-semibold hover:bg-purple-200 transition"
+        id="backto"
+        class="bg-gray-700 text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"
       >Kembali</button>
     </div>
-    <div id="srch" class="flex flex-col items-center p-5 mt-3 bg-white rounded shadow">
-      <p class="text-gray-400 text-center">Sedang memuat pencarian...</p>
+    <div id="srch" class="flex flex-col items-center p-5 mt-3 bg-gray-900 rounded shadow">
+      <p class="text-gray-300 text-center">Sedang memuat pencarian...</p>
     </div>
   `;
 }
