@@ -1,5 +1,6 @@
 import { navigateTo } from "../../router/router.js";
 import { fetchFromSource } from '../../api.js';
+import { getBookmarkTime, saveBookmarkTime, getLastResolution, saveLastResolution } from '../../storage/storage.js';
 
 async function loadStreaming(animeId, episodeId, container, rekomen) {
   try {
@@ -38,7 +39,7 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     // Tombol navigasi
     document.getElementById("backto").addEventListener("click", (e) => {
       e.preventDefault();
-      navigateTo(`/anime/otakudesu`);
+      navigateTo(`/`);
     });
 
     document.getElementById("nexteps").addEventListener("click", (e) => {
@@ -58,13 +59,12 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
 
     const player = document.getElementById("player");
     const buttonS = document.getElementById("servers");
-    const lastResolutionKey = `lastResolution-${animeId}`;
-    let lastResolution = localStorage.getItem(lastResolutionKey) || "main"; // Default ke "main" jika tidak ada
+    let lastResolution = await getLastResolution(animeId); // Default ke "main" jika tidak ada
 
     // Fungsi untuk mengatur player dan menyimpan resolusi
-    const setPlayerSource = (url, identifier) => {
+    const setPlayerSource = async (url, identifier) => {
       player.src = url;
-      localStorage.setItem(lastResolutionKey, identifier);
+      await saveLastResolution(animeId, identifier);
       // Highlight tombol aktif
       buttonS.querySelectorAll("button").forEach((b) => b.classList.remove("bg-purple-500", "text-white"));
       const activeBtn = buttonS.querySelector(`[data-identifier="${identifier}"]`);
@@ -122,10 +122,9 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     const secondsInput = document.getElementById("seconds");
     const saveButton = document.getElementById("saveTime");
     const savedTimeDisplay = document.getElementById("savedTime");
-    const timeKey = `episodeTime-${episodeId}`;
 
     // Load waktu tersimpan
-    const savedTime = JSON.parse(localStorage.getItem(timeKey));
+    const savedTime = await getBookmarkTime(episodeId);
     if (savedTime) {
       minutesInput.value = savedTime.minutes || 0;
       secondsInput.value = savedTime.seconds || 0;
@@ -135,11 +134,11 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     }
 
     // Simpan waktu
-    saveButton.addEventListener("click", () => {
+    saveButton.addEventListener("click", async () => {
       const minutes = parseInt(minutesInput.value) || 0;
       const seconds = parseInt(secondsInput.value) || 0;
       const timeData = { minutes, seconds };
-      localStorage.setItem(timeKey, JSON.stringify(timeData));
+      await saveBookmarkTime(episodeId, timeData);
       savedTimeDisplay.textContent = `Waktu tersimpan: ${minutes} menit ${seconds} detik`;
       alert("Waktu berhasil disimpan!");
     });

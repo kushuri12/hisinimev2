@@ -1,12 +1,3 @@
-- [x] Update index.html for dark theme background
-- [x] Update index.css with dark theme styles
-- [x] Update src/page/samehadaku/home.js dark theme classes
-- [x] Update src/page/otakudesu/home.js dark theme classes
-- [x] Update src/page/samehadaku/detail.js dark theme classes
-- [x] Update src/page/samehadaku/watch.js dark theme classes
-- [x] Update src/page/samehadaku/search.js dark theme classes
-- [x] Update src/page/samehadaku/favorite.js dark theme classes
-- [x] Update src/page/otakudesu/search.js dark theme classes
-- [x] Update src/page/otakudesu/favorite.js dark theme classes
-- [ ] Update other page files (search, favorite, etc.) if needed
-- [ ] Test the changes
+# TODO for Fixing OtakuDesu Search Navigation
+
+- [x] Edit hisinimev2/src/page/search.js to fix the navPath for OtakuDesu by changing `anime[lastPart]` to `lastPart` in the navigation path.

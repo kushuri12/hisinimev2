@@ -1,34 +1,34 @@
-import { fetchWithFallback } from '../api.js';
+import { fetchFromSource } from '../api.js';
+import { getFavorites } from '../storage/storage.js';
+import { initAuth, loginWithGoogle, logout, getCurrentUser } from '../auth.js';
 
-async function home_anime() {
+async function home_anime(sourceName, targetId) {
   try {
-    const result = await fetchWithFallback("complete-anime/1");
-    if (result?.data?.data?.completeAnimeData) {
-      displayAnime(result.data.data.completeAnimeData, "card-completed", result.source);
+    const result = await fetchFromSource(sourceName, "complete-anime/1");
+    const dataKey = sourceName === "OtakuDesu" ? "completeAnimeData" : "animeList";
+    if (result?.data?.data?.[dataKey]) {
+      displayAnime(result.data.data[dataKey], targetId, sourceName);
     } else {
-      document.getElementById("card-completed").innerText =
-        "Data anime tidak ditemukan.";
+      document.getElementById(targetId).innerText = "Data anime tidak ditemukan.";
     }
   } catch (err) {
     console.error("Gagal mengambil data completed:", err);
-    document.getElementById("card-completed").innerText =
-      "Gagal mengambil data anime.";
+    document.getElementById(targetId).innerText = "Gagal mengambil data anime.";
   }
 }
 
-async function home_anime2() {
+async function home_anime2(sourceName, targetId) {
   try {
-    const result = await fetchWithFallback("ongoing-anime");
-    if (result?.data?.data?.ongoingAnimeData) {
-      displayAnime(result.data.data.ongoingAnimeData, "card-ongoing", result.source);
+    const result = await fetchFromSource(sourceName, "ongoing-anime");
+    const dataKey = sourceName === "OtakuDesu" ? "ongoingAnimeData" : "animeList";
+    if (result?.data?.data?.[dataKey]) {
+      displayAnime(result.data.data[dataKey], targetId, sourceName);
     } else {
-      document.getElementById("card-ongoing").innerText =
-        "Data anime tidak ditemukan.";
+      document.getElementById(targetId).innerText = "Data anime tidak ditemukan.";
     }
   } catch (err) {
     console.error("Gagal mengambil data ongoing:", err);
-    document.getElementById("card-ongoing").innerText =
-      "Gagal mengambil data anime.";
+    document.getElementById(targetId).innerText = "Gagal mengambil data anime.";
   }
 }
 
@@ -39,9 +39,12 @@ function displayAnime(animeList, targetId, source) {
   animeList.forEach((anime) => {
     const card = document.createElement("div");
     card.className = "card min-w-[200px] max-w-[200px] snap-start flex flex-col relative cursor-pointer";
+    const episodeBadge = source === "OtakuDesu" ? `<span class="absolute top-2 right-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[12px] px-3 py-1 font-semibold shadow-lg">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>` : "";
+    const idKey = source === "OtakuDesu" ? "slug" : "animeId";
+    const navPath = source === "OtakuDesu" ? `/anime/otakudesu/detail?id=${anime[idKey]}` : `/anime/samehadaku/detail?id=${anime[idKey]}`;
     card.innerHTML = `
       <img src="${anime.poster}" alt="${anime.title}" class="w-full h-auto rounded-t-lg mb-3 object-cover" />
-      <span class="absolute top-2 right-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[12px] px-3 py-1 font-semibold shadow-lg">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>
+      ${episodeBadge}
       <div class="flex flex-col items-start p-4">
         <h3 class="font-bold text-sm mb-2 line-clamp-2 text-white">${anime.title}</h3>
         <span class="text-xs text-gray-400">From ${source}</span>
@@ -49,98 +52,311 @@ function displayAnime(animeList, targetId, source) {
     `;
 
     card.addEventListener("click", () => {
-      navigateTo(`/anime/detail?id=${anime.slug}`);
+      navigateTo(navPath);
     });
 
     grid.appendChild(card);
   });
 }
 
-export function home() {
-  setTimeout(() => {
-    // Load anime
-    home_anime();
-    home_anime2();
+function createHomePage(sourceName) {
+  const title = sourceName === "OtakuDesu" ? "HisiNime v2 - OtakuDesu Mode" : "HisiNime v2 - Samehadaku Mode";
+  const completedLabel = sourceName === "OtakuDesu" ? "Sudah Tamat (OtakuDesu)" : "Sudah Tamat (Samehadaku)";
+  const ongoingLabel = sourceName === "OtakuDesu" ? "Sedang Tayang (OtakuDesu)" : "Sedang Tayang (Samehadaku)";
+  const searchPath = sourceName === "OtakuDesu" ? "/anime/otakudesu/search?q=" : "/anime/samehadaku/search?q=";
+  const favPath = sourceName === "OtakuDesu" ? "/anime/otakudesu/favorite" : "/anime/samehadaku/favorite";
+  const otherSourcePath = sourceName === "OtakuDesu" ? "/anime/samehadaku" : "/anime/otakudesu";
+  const otherSourceBtn = sourceName === "OtakuDesu" ? "Samehadaku Mode" : "OtakuDesu Mode";
 
-    document.title = "HisiNime v2";
+  return function() {
+    setTimeout(() => {
+      // Load anime
+      home_anime(sourceName, "card-completed");
+      home_anime2(sourceName, "card-ongoing");
 
-    // Ambil elemen search & navbar setelah HTML ada di DOM
-    const searchInput = document.getElementById("input-btn");
-    const searchBtn = document.getElementById("search-btn");
-    const goToFav = document.getElementById("goToFavorite");
+      document.title = title;
 
-    // Listener search
-    const doSearch = () => {
-      const query = searchInput.value.trim();
-      if (!query) return;
-      navigateTo(`/anime/search?q=${encodeURIComponent(query)}`);
-    };
+      // Ambil elemen search & navbar setelah HTML ada di DOM
+      const searchInput = document.getElementById("input-btn");
+      const searchBtn = document.getElementById("search-btn");
+      const goToFav = document.getElementById("goToFavorite");
 
-    searchBtn.addEventListener("click", e => {
-      e.preventDefault();
-      doSearch();
-    });
+      // Listener search
+      const doSearch = () => {
+        const query = searchInput.value.trim();
+        if (!query) return;
+        navigateTo(`${searchPath}${encodeURIComponent(query)}`);
+      };
 
-    searchInput.addEventListener("keypress", e => {
-      if (e.key === "Enter") {
+      searchBtn.addEventListener("click", e => {
         e.preventDefault();
         doSearch();
+      });
+
+      searchInput.addEventListener("keypress", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          doSearch();
+        }
+      });
+
+      // Listener navbar
+      goToFav.addEventListener("click", e => {
+        e.preventDefault();
+        navigateTo(favPath);
+      });
+
+      const goToOther = document.getElementById("goToOther");
+      if (goToOther) {
+        goToOther.addEventListener("click", e => {
+          e.preventDefault();
+          navigateTo(otherSourcePath);
+        });
+      }
+
+    }, 0);
+
+    return `
+      <div class="nav-bar w-screen p-4">
+        <div class="flex flex-col items-center gap-4 max-w-4xl mx-auto">
+          <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">${title}</h1>
+
+          <div class="flex items-center gap-2 w-full max-w-md">
+            <input
+              id="input-btn"
+              class="input-modern flex-1"
+              type="text"
+              placeholder="Cari anime..."
+            />
+            <button id="search-btn" class="btn-primary">Cari</button>
+          </div>
+
+          <div class="flex flex-wrap gap-2 justify-center">
+            <button class="btn-secondary text-sm px-3 py-2" id="goToFavorite">Favorite</button>
+            <button class="btn-secondary text-sm px-3 py-2" id="goToOther">${otherSourceBtn}</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-section w-full max-w-6xl mx-auto">
+        <div class="mb-6">
+          <h2 class="text-gradient font-bold text-xl mb-4">${completedLabel}</h2>
+          <div id="card-completed" class="flex overflow-x-auto gap-4 pb-4">Sedang memuat konten...</div>
+        </div>
+
+        <div>
+          <h2 class="text-gradient font-bold text-xl mb-4">${ongoingLabel}</h2>
+          <div id="card-ongoing" class="flex overflow-x-auto gap-4 pb-4">Sedang memuat konten...</div>
+        </div>
+      </div>
+    `;
+  };
+}
+
+async function home_combined(type, targetId) {
+  try {
+    const results = [];
+
+    // Fetch from OtakuDesu
+    const resultOtaku = await fetchFromSource("OtakuDesu", type === "completed" ? "complete-anime/1" : "ongoing-anime");
+    const dataKeyOtaku = type === "completed" ? "completeAnimeData" : "ongoingAnimeData";
+    if (resultOtaku?.data?.data?.[dataKeyOtaku]) {
+      results.push(...resultOtaku.data.data[dataKeyOtaku].map(anime => ({ ...anime, source: "OtakuDesu" })));
+    }
+
+    // Fetch from Samehadaku
+    const resultSame = await fetchFromSource("Samehadaku", type === "completed" ? "complete-anime/1" : "ongoing-anime");
+    const dataKeySame = "animeList";
+    if (resultSame?.data?.data?.[dataKeySame]) {
+      results.push(...resultSame.data.data[dataKeySame].map(anime => ({ ...anime, source: "Samehadaku" })));
+    }
+
+    // Shuffle or sort the combined results
+    const shuffled = results.sort(() => Math.random() - 0.5);
+
+    displayAnimeCombined(shuffled, targetId);
+  } catch (err) {
+    console.error(`Gagal mengambil data ${type}:`, err);
+    document.getElementById(targetId).innerText = `Gagal mengambil data ${type}.`;
+  }
+}
+
+function displayAnimeCombined(animeList, targetId) {
+  const grid = document.getElementById(targetId);
+  grid.innerHTML = "";
+
+  animeList.forEach((anime) => {
+    const source = anime.source;
+    const card = document.createElement("div");
+    card.className = "card min-w-[200px] max-w-[200px] snap-start flex flex-col relative cursor-pointer";
+    const episodeBadge = source === "OtakuDesu" ? `<span class="absolute top-2 right-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[12px] px-3 py-1 font-semibold shadow-lg">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>` : `<span class="absolute top-2 right-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500 text-white text-[12px] px-3 py-1 font-semibold shadow-lg">${anime.type || "N/A"}</span>`;
+    const idKey = source === "OtakuDesu" ? "slug" : "animeId";
+    const navPath = source === "OtakuDesu" ? `/anime/otakudesu/detail?id=${anime[idKey]}` : `/anime/samehadaku/detail?id=${anime[idKey]}`;
+    card.innerHTML = `
+      <img src="${anime.poster}" alt="${anime.title}" class="w-full h-auto rounded-t-lg mb-3 object-cover" />
+      ${episodeBadge}
+      <div class="flex flex-col items-start p-4">
+        <h3 class="font-bold text-sm mb-2 line-clamp-2 text-white">${anime.title}</h3>
+        <span class="text-xs text-gray-400">From ${source}</span>
+      </div>
+    `;
+
+    card.addEventListener("click", () => {
+      navigateTo(navPath);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+function createHomeBoth() {
+  return function() {
+    setTimeout(() => {
+      // Initialize auth
+      initAuth();
+
+      // Load combined anime
+      home_combined("completed", "card-completed");
+      home_combined("ongoing", "card-ongoing");
+
+      document.title = "HisiNime v2";
+
+      // Ambil elemen search & navbar setelah HTML ada di DOM
+      const searchInput = document.getElementById("input-btn");
+      const searchBtn = document.getElementById("search-btn");
+      const goToFav = document.getElementById("goToFavorite");
+
+      // Listener search - use combined search
+      const doSearch = () => {
+        const query = searchInput.value.trim();
+        if (!query) return;
+        navigateTo(`/search?q=${encodeURIComponent(query)}`);
+      };
+
+      searchBtn.addEventListener("click", e => {
+        e.preventDefault();
+        doSearch();
+      });
+
+      searchInput.addEventListener("keypress", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          doSearch();
+        }
+      });
+
+      // Listener navbar
+      goToFav.addEventListener("click", e => {
+        e.preventDefault();
+        navigateTo("/favorite");
+      });
+
+      const goToDashboard = document.getElementById("goToDashboard");
+      if (goToDashboard) {
+        goToDashboard.addEventListener("click", e => {
+          e.preventDefault();
+          navigateTo("/dashboard");
+        });
+      }
+
+      // Update auth UI on state change
+      window.addEventListener('authStateChanged', (e) => {
+        updateAuthUI(e.detail.user);
+      });
+
+      // Initial auth UI update
+      updateAuthUI(getCurrentUser());
+
+    }, 0);
+
+    return `
+      <div class="nav-bar w-screen p-4">
+        <div class="flex flex-col items-center gap-4 max-w-4xl mx-auto">
+          <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">HisiNime v2</h1>
+
+          <div id="auth-section" class="flex items-center gap-2 mb-4">
+            <!-- Auth buttons will be inserted here -->
+          </div>
+
+          <div class="flex items-center gap-2 w-full max-w-md">
+            <input
+              id="input-btn"
+              class="input-modern flex-1"
+              type="text"
+              placeholder="Cari anime..."
+            />
+            <button id="search-btn" class="btn-primary">Cari</button>
+          </div>
+
+          <div class="flex flex-wrap gap-2 justify-center">
+            <button class="btn-secondary text-sm px-3 py-2" id="goToFavorite">Favorite</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-section w-full max-w-6xl mx-auto">
+        <div class="mb-6">
+          <h2 class="text-gradient font-bold text-xl mb-4">Sudah Tamat</h2>
+          <div id="card-completed" class="flex overflow-x-auto gap-4 pb-4">Sedang memuat konten...</div>
+        </div>
+
+        <div>
+          <h2 class="text-gradient font-bold text-xl mb-4">Sedang Tayang</h2>
+          <div id="card-ongoing" class="flex overflow-x-auto gap-4 pb-4">Sedang memuat konten...</div>
+        </div>
+      </div>
+    `;
+  };
+}
+
+function updateAuthUI(user) {
+  const authSection = document.getElementById("auth-section");
+  if (user) {
+    authSection.innerHTML = `
+      <span class="text-white">Halo, ${user.displayName || user.email}</span>
+      <button id="logout" class="btn-secondary text-sm px-3 py-2">Logout</button>
+      <button id="goToDashboard" class="btn-primary text-sm px-3 py-2">Dashboard</button>
+    `;
+  } else {
+    authSection.innerHTML = `
+      <button id="login-google" class="btn-secondary text-sm px-3 py-2">Login Google</button>
+    `;
+  }
+
+  // Attach event listeners after updating the UI
+  const loginGoogleBtn = document.getElementById("login-google");
+  const logoutBtn = document.getElementById("logout");
+  const dashboardBtn = document.getElementById("goToDashboard");
+
+  if (loginGoogleBtn) {
+    loginGoogleBtn.addEventListener("click", async () => {
+      try {
+        await loginWithGoogle();
+      } catch (error) {
+        alert("Login gagal: " + error.message);
       }
     });
+  }
 
-    // Listener navbar
-    goToFav.addEventListener("click", e => {
-      e.preventDefault();
-      navigateTo(`/anime/favorite`);
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await logout();
+      } catch (error) {
+        alert("Logout gagal: " + error.message);
+      }
     });
+  }
 
-    const goToOtakuDesu = document.getElementById("goToOtakuDesu");
-    goToOtakuDesu.addEventListener("click", e => {
-      e.preventDefault();
-      navigateTo(`/anime/otakudesu`);
+  if (dashboardBtn) {
+    dashboardBtn.addEventListener("click", () => {
+      navigateTo("/dashboard");
     });
-
-    const goToSamehadaku = document.getElementById("goToSamehadaku");
-    goToSamehadaku.addEventListener("click", e => {
-      e.preventDefault();
-      navigateTo(`/anime/samehadaku`);
-    });
-
-  }, 0);
-
-  return `
-    <div class="nav-bar w-screen p-4">
-      <div class="flex flex-col items-center gap-4 max-w-4xl mx-auto">
-        <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">HisiNime v2</h1>
-
-        <div class="flex items-center gap-2 w-full max-w-md">
-          <input
-            id="input-btn"
-            class="input-modern flex-1"
-            type="text"
-            placeholder="Cari anime..."
-          />
-          <button id="search-btn" class="btn-primary">Cari</button>
-        </div>
-
-        <div class="flex flex-wrap gap-2 justify-center">
-          <button class="btn-secondary text-sm px-3 py-2" id="goToFavorite">Favorite</button>
-          <button class="btn-secondary text-sm px-3 py-2" id="goToOtakuDesu">OtakuDesu Mode</button>
-          <button class="btn-secondary text-sm px-3 py-2" id="goToSamehadaku">Samehadaku Mode</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="content-section w-full max-w-6xl mx-auto">
-      <div class="mb-6">
-        <h2 class="text-gradient font-bold text-xl mb-4">Sudah Tamat</h2>
-        <div id="card-completed" class="flex overflow-x-auto gap-4 pb-4">Sedang memuat konten...</div>
-      </div>
-
-      <div>
-        <h2 class="text-gradient font-bold text-xl mb-4">Sedang Tayang</h2>
-        <div id="card-ongoing" class="flex overflow-x-auto gap-4 pb-4">Sedang memuat konten...</div>
-      </div>
-    </div>
-  `;
+  }
 }
+
+
+
+export const homeOtakuDesu = createHomePage("OtakuDesu");
+export const homeSamehadaku = createHomePage("Samehadaku");
+export const homeBoth = createHomeBoth();

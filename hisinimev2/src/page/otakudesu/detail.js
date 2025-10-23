@@ -23,7 +23,8 @@ async function getDetailAnime(id, container) {
 
     const anime = data.data.data;
 
-    const isFavorited = getFavorites().includes(id);
+    const favs = await getFavorites();
+    const isFavorited = favs.some(fav => (typeof fav === 'string' ? fav == id : fav.id == id && fav.source == data.source));
 
     container.innerHTML = `
     <a class="absolute left-1 top-1 bg-gray-700 text-center p-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="backto">Kembali</a>
@@ -89,16 +90,17 @@ async function getDetailAnime(id, container) {
     });
 
     // Event listener untuk tombol favorite
-    document.getElementById("favoriteBtn").addEventListener("click", () => {
+    document.getElementById("favoriteBtn").addEventListener("click", async () => {
       const btn = document.getElementById("favoriteBtn");
-      const isFavorited = getFavorites().includes(id);
+      const favs = await getFavorites();
+      const isFavorited = favs.some(fav => (typeof fav === 'string' ? fav === id : fav.id === id && fav.source === "OtakuDesu"));
       if (isFavorited) {
-        removeFavorite(id);
+        await removeFavorite(id, "OtakuDesu");
         btn.textContent = "Tambah Favorit";
         btn.className =
           "mt-2 px-3 py-1 w-[130px] rounded text-sm bg-purple-500 text-white hover:opacity-80 transition";
       } else {
-        addFavorite(id);
+        await addFavorite(id, "OtakuDesu", anime.title, anime.poster);
         btn.textContent = "Hapus Favorit";
         btn.className =
           "mt-2 px-3 py-1 w-[130px] rounded text-sm bg-red-500 text-white hover:opacity-80 transition";

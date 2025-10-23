@@ -1,5 +1,6 @@
 import { navigateTo } from "../../router/router.js";
 import { fetchFromSource } from '../../api.js';
+import { getBookmarkTime, saveBookmarkTime, getPreferredResolution, savePreferredResolution } from '../../storage/storage.js';
 
 const API = "https://www.sankavollerei.com/anime/";
 
@@ -42,7 +43,7 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     // Tombol navigasi
     document.getElementById("backto").addEventListener("click", (e) => {
       e.preventDefault();
-      navigateTo(`/anime/samehadaku`);
+      navigateTo(`/`);
     });
 
     document.getElementById("nexteps").addEventListener("click", (e) => {
@@ -68,10 +69,9 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     const secondsInput = document.getElementById("seconds");
     const saveButton = document.getElementById("saveTime");
     const savedTimeDisplay = document.getElementById("savedTime");
-    const timeKey = `episodeTime-${episodeId}`;
 
     // Load waktu tersimpan
-    const savedTime = JSON.parse(localStorage.getItem(timeKey));
+    const savedTime = await getBookmarkTime(episodeId);
     if (savedTime) {
       minutesInput.value = savedTime.minutes || 0;
       secondsInput.value = savedTime.seconds || 0;
@@ -81,11 +81,11 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     }
 
     // Simpan waktu
-    saveButton.addEventListener("click", () => {
+    saveButton.addEventListener("click", async () => {
       const minutes = parseInt(minutesInput.value) || 0;
       const seconds = parseInt(secondsInput.value) || 0;
       const timeData = { minutes, seconds };
-      localStorage.setItem(timeKey, JSON.stringify(timeData));
+      await saveBookmarkTime(episodeId, timeData);
       savedTimeDisplay.textContent = `Waktu tersimpan: ${minutes} menit ${seconds} detik`;
       alert("Waktu berhasil disimpan!");
     });
@@ -149,19 +149,19 @@ async function rekomenAnime(container) {
   }
 }
 
-function renderQualities(qualities) {
+async function renderQualities(qualities) {
   const qEl = document.getElementById("qualities");
   qEl.innerHTML = "";
 
   let targetButton = null;
-  const savedResolution = localStorage.getItem("preferredResolution");
+  const savedResolution = await getPreferredResolution();
 
   qualities.forEach(q => {
     if (!q.serverList?.length) return;
 
-    const btn = createButton(q.title, () => {
+    const btn = createButton(q.title, async () => {
       // simpan resolusi yang dipilih user
-      localStorage.setItem("preferredResolution", q.title);
+      await savePreferredResolution(q.title);
       renderServers(q.serverList);
     });
 
