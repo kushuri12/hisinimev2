@@ -90,7 +90,7 @@ function createSearchBoth() {
 
     return `
       <div class="w-full flex justify-start p-4 bg-gray-900 shadow-sm z-10">
-        <button onclick="window.history.back()" id="backto" class="bg-gray-700 text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition">Kembali</button>
+        <button onclick="window.history.back()" id="backto" class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
       </div>
       <div id="srch" class="flex flex-col items-center p-5 mt-3 bg-gray-900 rounded shadow">
         <p class="text-gray-300 text-center">Sedang memuat pencarian...</p>

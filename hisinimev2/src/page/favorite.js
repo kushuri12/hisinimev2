@@ -19,8 +19,8 @@ function createFavoriteBoth() {
         <a
           href=""
           id="backto"
-          class="bg-gray-700 text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"
-        >Kembali</a>
+          class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"
+        ><i class="fas fa-arrow-left"></i></a>
       </div>
       <div id="favorites" class="mt-3 rounded shadow flex flex-col items-center p-5 w-full md:w-[100vh] bg-gray-900">
         <p class="text-gray-300 text-center">Sedang memuat favorit...</p>
@@ -40,11 +40,8 @@ async function renderFavoritesBoth(container, navigateTo) {
     return;
   }
 
-  const ul = document.createElement('ul');
-  ul.className = 'flex flex-col gap-2 w-full';
-  container.appendChild(ul);
-
-  for (let fav of favs) {
+  // Prepare fetch promises for all favorites
+  const fetchPromises = favs.map(async (fav) => {
     try {
       // Handle migration: old favorites are strings or objects without source
       let id, source;
@@ -62,57 +59,71 @@ async function renderFavoritesBoth(container, navigateTo) {
         source = 'Samehadaku';
       } else {
         console.warn('Invalid favorite format:', fav);
-        continue;
+        return null;
       }
+
       // Fetch data anime sesuai ID dan source
       const { fetchFromSource } = await import('../api.js');
       const result = await fetchFromSource(source, `anime/${encodeURIComponent(id)}`);
 
       if (!result.data) {
         console.warn('Data anime tidak ditemukan:', id);
-        continue;
+        return null;
       }
 
       const data = result.data.data;
-
-      // Buat list item
-      const li = document.createElement('li');
-      li.className = 'flex items-center justify-between bg-gray-800 border border-purple-600 px-3 py-2 rounded hover:bg-gray-700 transition cursor-pointer';
-
-      // Konten anime
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'flex items-center gap-3';
-      const img = document.createElement('img');
-      img.src = data.poster;
-      img.width = 50;
-      img.className = 'rounded-md';
-      const textDiv = document.createElement('div');
-      textDiv.className = 'flex flex-col';
-      const titleSpan = document.createElement('span');
-      titleSpan.textContent = data.title || data.english;
-      titleSpan.className = 'text-white';
-      const episodeSpan = document.createElement('span');
-      episodeSpan.textContent = `Episode: ${source === "OtakuDesu" ? data.episode_count : data.episodes}`;
-      episodeSpan.className = 'text-sm text-gray-300';
-      const sourceSpan = document.createElement('span');
-      sourceSpan.textContent = `From ${source}`;
-      sourceSpan.className = 'text-xs text-gray-400';
-
-      textDiv.appendChild(titleSpan);
-      textDiv.appendChild(episodeSpan);
-      textDiv.appendChild(sourceSpan);
-      infoDiv.appendChild(img);
-      infoDiv.appendChild(textDiv);
-
-      // Gabungkan semuanya
-      li.appendChild(infoDiv);
-      li.onclick = () => navigateTo(`/anime/${source.toLowerCase()}/detail?id=${id}`);
-      ul.appendChild(li);
-
+      return { id, source, data };
     } catch (err) {
       console.error('Gagal load anime favorit:', fav.id || fav, err);
+      return null;
     }
-  }
+  });
+
+  // Wait for all fetches to complete
+  const results = await Promise.all(fetchPromises);
+
+  // Filter out null results and render all at once
+  const validResults = results.filter(result => result !== null);
+
+  const ul = document.createElement('ul');
+  ul.className = 'flex flex-col gap-2 w-full';
+  container.appendChild(ul);
+
+  validResults.forEach(({ id, source, data }) => {
+    // Buat list item
+    const li = document.createElement('li');
+    li.className = 'flex items-center justify-between bg-gray-800 px-3 py-2 rounded hover:bg-gray-700 transition cursor-pointer';
+
+    // Konten anime
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'flex items-center gap-3';
+    const img = document.createElement('img');
+    img.src = data.poster;
+    img.width = 50;
+    img.className = 'rounded-md';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'flex flex-col';
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = data.title || data.english;
+    titleSpan.className = 'text-white';
+    const episodeSpan = document.createElement('span');
+    episodeSpan.textContent = `Episode: ${source === "OtakuDesu" ? data.episode_count : data.episodes}`;
+    episodeSpan.className = 'text-sm text-gray-300';
+    const sourceSpan = document.createElement('span');
+    sourceSpan.textContent = `From ${source}`;
+    sourceSpan.className = 'text-xs text-gray-400';
+
+    textDiv.appendChild(titleSpan);
+    textDiv.appendChild(episodeSpan);
+    textDiv.appendChild(sourceSpan);
+    infoDiv.appendChild(img);
+    infoDiv.appendChild(textDiv);
+
+    // Gabungkan semuanya
+    li.appendChild(infoDiv);
+    li.onclick = () => navigateTo(`/anime/${source.toLowerCase()}/detail?id=${id}`);
+    ul.appendChild(li);
+  });
 }
 
 export const favoriteBoth = createFavoriteBoth();

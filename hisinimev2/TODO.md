@@ -1,3 +1,7 @@
-# TODO for Fixing OtakuDesu Search Navigation
-
-- [x] Edit hisinimev2/src/page/search.js to fix the navPath for OtakuDesu by changing `anime[lastPart]` to `lastPart` in the navigation path.
+- [x] Add Font Awesome CDN to index.html
+- [x] Edit kembali button in search.js
+- [x] Edit kembali button in samehadaku/detail.js
+- [x] Edit kembali button in otakudesu/detail.js
+- [x] Edit kembali button in samehadaku/watch.js
+- [x] Edit kembali button in otakudesu/watch.js
+- [x] Edit kembali button in favorite.js

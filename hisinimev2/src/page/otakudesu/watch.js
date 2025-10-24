@@ -12,7 +12,7 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     const data = result.data;
 
     container.innerHTML = `
-      <a class="bg-gray-700 text-center p-2 mr-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="backto">Kembali</a>
+      <a class="bg-transparent backdrop-blur-sm text-center px-3 py-2 mr-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="backto"><i class="fas fa-arrow-left"></i></a>
       <h1 class="mt-5 font-bold text-xl text-center mb-4 text-white">${data.data.episode}</h1>
 
       <div class="flex justify-between mt-3 w-full">

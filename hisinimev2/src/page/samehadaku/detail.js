@@ -27,7 +27,7 @@ async function getDetailAnime(id, container) {
     const isFavorited = favs.some(fav => (typeof fav === 'string' ? fav === id : fav.id === id && fav.source == data.source));
 
     container.innerHTML = `
-    <a class="absolute left-1 top-1 bg-gray-700 text-center p-2 rounded text-purple-400 hover:bg-purple-600 transition" href="#" id="backto">Kembali</a>
+    <a class="absolute left-2 top-4 bg-transparent backdrop-blur-sm text-center text-xl p-2 rounded text-purple-400 hover:bg-purple-600 transition fas fa-arrow-left" href="#" id="backto"></a>
       <img src="${anime.poster}" alt="${
       anime.title || "tidak diketahui"
     }" class="object-cover w-[30vh] md:w-[50vh] rounded-md mb-5 md:mb-0 mx-auto md:mx-0 md:mr-5"/>
@@ -130,7 +130,7 @@ async function getEpisodes(animeId, container) {
         (ep) => `
       <a
   href="/anime/samehadaku/watch?id=${ep.episodeId}"
-  class="flex items-center justify-between bg-gray-800 border border-purple-600 text-purple-200 text-sm md:text-base px-3 py-2 rounded hover:bg-purple-700 transition"
+  class="flex items-center justify-between bg-gray-800 text-purple-200 text-sm md:text-base px-3 py-2 rounded hover:bg-purple-700 transition"
   data-episode="${ep.episodeId}"
 >
   <div class="flex items-center">

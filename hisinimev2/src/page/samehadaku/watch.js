@@ -1,6 +1,6 @@
 import { navigateTo } from "../../router/router.js";
 import { fetchFromSource } from '../../api.js';
-import { getBookmarkTime, saveBookmarkTime, getPreferredResolution, savePreferredResolution } from '../../storage/storage.js';
+import { getBookmarkTime, saveBookmarkTime, getLastResolution, saveLastResolution } from '../../storage/storage.js';
 
 const API = "https://www.sankavollerei.com/anime/";
 
@@ -14,7 +14,7 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     const data = result.data.data;
 
     container.innerHTML = `
-      <a class="bg-gray-700 text-center p-2 mr-2 rounded text-purple-400 hover:bg-purple-600 transition" href="#" id="backto">Kembali</a>
+      <a class="bg-transparent backdrop-blur-sm text-center px-3 py-2 mr-2 rounded text-purple-400 hover:bg-purple-600 transition" href="#" id="backto"><i class="fas fa-arrow-left"></i></a>
       <h1 class="mt-5 font-bold text-xl text-center mb-4 text-white">${data.title}</h1>
 
       <div class="flex justify-between mt-3 w-full">
@@ -59,7 +59,7 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
       }
     });
 
-    renderQualities(data.server.qualities);
+    renderQualities(data.server.qualities, animeId);
 
     // Load rekomendasi anime
     rekomenAnime(rekomen);
@@ -149,19 +149,19 @@ async function rekomenAnime(container) {
   }
 }
 
-async function renderQualities(qualities) {
+async function renderQualities(qualities, animeId) {
   const qEl = document.getElementById("qualities");
   qEl.innerHTML = "";
 
   let targetButton = null;
-  const savedResolution = await getPreferredResolution();
+  const savedResolution = await getLastResolution(animeId);
 
   qualities.forEach(q => {
     if (!q.serverList?.length) return;
 
     const btn = createButton(q.title, async () => {
       // simpan resolusi yang dipilih user
-      await savePreferredResolution(q.title);
+      await saveLastResolution(animeId, q.title);
       renderServers(q.serverList);
     });
 
