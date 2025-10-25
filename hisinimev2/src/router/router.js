@@ -1,3 +1,4 @@
+import { initAuth } from '../auth.js';
 import { homeOtakuDesu, homeSamehadaku, homeBoth } from '../page/home.js';
 import { favoriteBoth } from '../page/favorite.js';
 import { searchBoth } from '../page/search.js';
@@ -10,6 +11,9 @@ import { watch as otakudesuWatch } from '../page/otakudesu/watch.js';
 // Samehadaku pages
 import { detail as samehadakuDetail } from '../page/samehadaku/detail.js';
 import { watch as samehadakuWatch } from '../page/samehadaku/watch.js';
+
+// Initialize auth on every page load
+initAuth();
 
 const routes = {
     "/": homeBoth,

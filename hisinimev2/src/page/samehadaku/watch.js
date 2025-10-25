@@ -1,6 +1,6 @@
 import { navigateTo } from "../../router/router.js";
 import { fetchFromSource } from '../../api.js';
-import { getBookmarkTime, saveBookmarkTime, getLastResolution, saveLastResolution } from '../../storage/storage.js';
+import { getBookmarkTime, saveBookmarkTime, getPreferredResolution, savePreferredResolution } from '../../storage/storage.js';
 
 const API = "https://www.sankavollerei.com/anime/";
 
@@ -59,7 +59,7 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
       }
     });
 
-    renderQualities(data.server.qualities, animeId);
+    renderQualities(data.server.qualities);
 
     // Load rekomendasi anime
     rekomenAnime(rekomen);
@@ -149,19 +149,19 @@ async function rekomenAnime(container) {
   }
 }
 
-async function renderQualities(qualities, animeId) {
+async function renderQualities(qualities) {
   const qEl = document.getElementById("qualities");
   qEl.innerHTML = "";
 
   let targetButton = null;
-  const savedResolution = await getLastResolution(animeId);
+  const savedResolution = await getPreferredResolution();
 
   qualities.forEach(q => {
     if (!q.serverList?.length) return;
 
     const btn = createButton(q.title, async () => {
       // simpan resolusi yang dipilih user
-      await saveLastResolution(animeId, q.title);
+      await savePreferredResolution(q.title);
       renderServers(q.serverList);
     });
 
@@ -224,8 +224,8 @@ function createButton(text, onClick) {
   btn.textContent = text;
   btn.className = "px-2 py-1 bg-gray-600 rounded hover:bg-purple-600 text-white";
   btn.addEventListener("click", () => {
-    btn.parentElement.querySelectorAll("button").forEach(b => b.classList.remove("bg-purple-600","text-white"));
-    btn.classList.add("bg-purple-600","text-white");
+    btn.parentElement.querySelectorAll("button").forEach(b => b.classList.replace("bg-purple-600", "bg-gray-600"));
+    btn.classList.replace("bg-gray-600", "bg-purple-600");
     onClick();
   });
   return btn;

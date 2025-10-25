@@ -1,40 +1,30 @@
-import { getCurrentUser, logout } from '../auth.js';
-import { navigateTo } from '../router/router.js';
+import { getCurrentUser, logout } from "../auth.js";
+import { navigateTo } from "../router/router.js";
 
 function createDashboardPage() {
-  return function() {
+  return function () {
     const user = getCurrentUser();
     if (!user) {
       // Redirect to home if not logged in
-      navigateTo('/');
+      navigateTo("/");
       return;
     }
 
     setTimeout(async () => {
-      document.title = 'Dashboard - HisiNime v2';
-
-
-
+      document.title = "Dashboard - HisiNime v2";
       // Logout listener
-      const logoutBtn = document.getElementById('logout-dashboard');
+      const logoutBtn = document.getElementById("logout-dashboard");
       if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
+        logoutBtn.addEventListener("click", async () => {
           try {
             await logout();
-            navigateTo('/');
+            navigateTo("/");
           } catch (error) {
-            alert('Logout gagal: ' + error.message);
+            alert("Logout gagal: " + error.message);
           }
         });
       }
 
-      // Back to home listener
-      const backHomeBtn = document.getElementById('back-home');
-      if (backHomeBtn) {
-        backHomeBtn.addEventListener('click', () => {
-          navigateTo('/');
-        });
-      }
     }, 0);
 
     return `
@@ -43,9 +33,10 @@ function createDashboardPage() {
           <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">Dashboard - HisiNime v2</h1>
 
           <div class="flex items-center gap-2 mb-4">
-            <span class="text-white">Halo, ${user.displayName || user.email}</span>
-            <button id="logout-dashboard" class="btn-secondary text-sm px-3 py-2">Logout</button>
-            <button id="back-home" class="btn-primary text-sm px-3 py-2">Kembali ke Home</button>
+            <span class="text-white">Halo, ${
+              user.displayName || user.email
+            }</span>
+            <button id="logout-dashboard" class="btn-secondary text-sm px-3 py-2">Logout <i class="fa-solid fa-right-from-bracket"></i></button>
           </div>
         </div>
       </div>
@@ -54,14 +45,19 @@ function createDashboardPage() {
         <div class="mb-6">
           <h2 class="text-gradient font-bold text-xl mb-4">Informasi Akun</h2>
           <div class="bg-gray-800 p-4 rounded-lg">
-            <p class="text-white"><strong>Nama:</strong> ${user.displayName || 'N/A'}</p>
-            <p class="text-white"><strong>Email:</strong> ${user.email || 'N/A'}</p>
+          <img id="userPP" src=${user.photoURL} alt="Profile Picture" class="mb-2 w-[70px] h-[70px] rounded-full object-cover" />
+            <p class="text-white"><strong>Nama:</strong> ${
+              user.displayName || "N/A"
+            }</p>
+            <p class="text-white"><strong>Email:</strong> ${
+              user.email || "N/A"
+            }</p>
             <p class="text-white"><strong>UID:</strong> ${user.uid}</p>
-            <p class="text-white"><strong>Provider:</strong> ${user.providerData[0]?.providerId || 'N/A'}</p>
+            <p class="text-white"><strong>Provider:</strong> ${
+              user.providerData[0]?.providerId || "N/A"
+            }</p>
           </div>
         </div>
-
-
       </div>
     `;
   };

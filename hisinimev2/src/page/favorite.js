@@ -36,7 +36,7 @@ async function renderFavoritesBoth(container, navigateTo) {
   const favs = await getFavorites();
 
   if (!favs || favs.length === 0) {
-    container.innerHTML += '<p class="text-gray-300">Belum ada anime favorit.</p>';
+    container.innerHTML += '<p class="text-gray-300">Belum ada anime favorit nih...</p>';
     return;
   }
 

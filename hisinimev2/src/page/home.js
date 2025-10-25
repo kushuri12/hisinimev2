@@ -212,9 +212,6 @@ function displayAnimeCombined(animeList, targetId) {
 function createHomeBoth() {
   return function() {
     setTimeout(() => {
-      // Initialize auth
-      initAuth();
-
       // Load combined anime
       home_combined("completed", "card-completed");
       home_combined("ongoing", "card-ongoing");
@@ -224,7 +221,6 @@ function createHomeBoth() {
       // Ambil elemen search & navbar setelah HTML ada di DOM
       const searchInput = document.getElementById("input-btn");
       const searchBtn = document.getElementById("search-btn");
-      const goToFav = document.getElementById("goToFavorite");
 
       // Listener search - use combined search
       const doSearch = () => {
@@ -245,28 +241,6 @@ function createHomeBoth() {
         }
       });
 
-      // Listener navbar
-      goToFav.addEventListener("click", e => {
-        e.preventDefault();
-        navigateTo("/favorite");
-      });
-
-      const goToDashboard = document.getElementById("goToDashboard");
-      if (goToDashboard) {
-        goToDashboard.addEventListener("click", e => {
-          e.preventDefault();
-          navigateTo("/dashboard");
-        });
-      }
-
-      // Update auth UI on state change
-      window.addEventListener('authStateChanged', (e) => {
-        updateAuthUI(e.detail.user);
-      });
-
-      // Initial auth UI update
-      updateAuthUI(getCurrentUser());
-
     }, 0);
 
     return `
@@ -285,12 +259,9 @@ function createHomeBoth() {
               type="text"
               placeholder="Cari anime..."
             />
-            <button id="search-btn" class="btn-primary">Cari</button>
+            <button id="search-btn" class="btn-primary"><i class="fa-solid fa-magnifying-glass"></i></button>
           </div>
 
-          <div class="flex flex-wrap gap-2 justify-center">
-            <button class="btn-secondary text-sm px-3 py-2" id="goToFavorite">Favorite</button>
-          </div>
         </div>
       </div>
 
@@ -313,49 +284,11 @@ function updateAuthUI(user) {
   const authSection = document.getElementById("auth-section");
   if (user) {
     authSection.innerHTML = `
-      <span class="text-white">Halo, ${user.displayName || user.email}</span>
-      <button id="logout" class="btn-secondary text-sm px-3 py-2">Logout</button>
-      <button id="goToDashboard" class="btn-primary text-sm px-3 py-2">Dashboard</button>
-    `;
-  } else {
-    authSection.innerHTML = `
-      <button id="login-google" class="btn-secondary text-sm px-3 py-2">Login Google</button>
+      <span class="text-white">Welcome, ${user.displayName || user.email}</span>
     `;
   }
 
-  // Attach event listeners after updating the UI
-  const loginGoogleBtn = document.getElementById("login-google");
-  const logoutBtn = document.getElementById("logout");
-  const dashboardBtn = document.getElementById("goToDashboard");
-
-  if (loginGoogleBtn) {
-    loginGoogleBtn.addEventListener("click", async () => {
-      try {
-        await loginWithGoogle();
-      } catch (error) {
-        alert("Login gagal: " + error.message);
-      }
-    });
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await logout();
-      } catch (error) {
-        alert("Logout gagal: " + error.message);
-      }
-    });
-  }
-
-  if (dashboardBtn) {
-    dashboardBtn.addEventListener("click", () => {
-      navigateTo("/dashboard");
-    });
-  }
 }
-
-
 
 export const homeOtakuDesu = createHomePage("OtakuDesu");
 export const homeSamehadaku = createHomePage("Samehadaku");
