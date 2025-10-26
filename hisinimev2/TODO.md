@@ -1,12 +1,5 @@
-- [x] Add Font Awesome CDN to index.html
-- [x] Edit kembali button in search.js
-- [x] Edit kembali button in samehadaku/detail.js
-- [x] Edit kembali button in otakudesu/detail.js
-- [x] Edit kembali button in samehadaku/watch.js
-- [x] Edit kembali button in otakudesu/watch.js
-- [x] Edit kembali button in favorite.js
-- [x] Add history storage functions to storage.js (getHistory, saveHistory, removeHistory)
-- [x] Modify samehadaku/watch.js to save history on episode load
-- [x] Modify otakudesu/watch.js to save history on episode load
-- [x] Implement history.js to display watch history list
-- [x] Update navbar to include history link if not present
+# TODO: Modify History to One Entry Per Anime
+
+- [x] Modify saveHistory function in storage.js for localStorage: Change filtering to remove existing entries for the same animeId and source (not episodeId), then add the new historyItem.
+- [x] Modify saveHistoryToFirestore function: Change query to check by animeId and source only. Update existing or add new.
+- [x] Modify removeHistoryFromFirestore function: Change query to remove by animeId and source only.

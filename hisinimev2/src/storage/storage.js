@@ -269,8 +269,8 @@ export async function saveHistory(animeId, episodeId, animeTitle, episodeTitle, 
     await saveHistoryToFirestore(user.uid, historyItem);
   } else {
     const history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
-    // Remove existing entry for this episode if exists
-    const filtered = history.filter(h => !(h.animeId === animeId && h.episodeId === episodeId && h.source === source));
+    // Remove existing entry for this anime if exists
+    const filtered = history.filter(h => !(h.animeId === animeId && h.source === source));
     filtered.unshift(historyItem); // Add to beginning
     // Keep only last 100 entries
     if (filtered.length > 100) filtered.splice(100);
@@ -312,8 +312,8 @@ export async function getHistoryFromFirestore(uid) {
 export async function saveHistoryToFirestore(uid, historyItem) {
   try {
     const historyRef = collection(db, 'users', uid, 'history');
-    // Check if entry already exists
-    const q = query(historyRef, where('animeId', '==', historyItem.animeId), where('episodeId', '==', historyItem.episodeId), where('source', '==', historyItem.source));
+    // Check if entry already exists for this anime
+    const q = query(historyRef, where('animeId', '==', historyItem.animeId), where('source', '==', historyItem.source));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
       // Update existing
@@ -330,12 +330,12 @@ export async function saveHistoryToFirestore(uid, historyItem) {
 
 export async function removeHistoryFromFirestore(uid, animeId, episodeId, source) {
   try {
-    if (!animeId || !episodeId || !source) {
-      console.error('Invalid parameters for removing history:', { animeId, episodeId, source });
+    if (!animeId || !source) {
+      console.error('Invalid parameters for removing history:', { animeId, source });
       return;
     }
     const historyRef = collection(db, 'users', uid, 'history');
-    const q = query(historyRef, where('animeId', '==', animeId), where('episodeId', '==', episodeId), where('source', '==', source));
+    const q = query(historyRef, where('animeId', '==', animeId), where('source', '==', source));
     const querySnapshot = await getDocs(q);
     const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
     await Promise.all(deletePromises);
