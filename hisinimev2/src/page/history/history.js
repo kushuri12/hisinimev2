@@ -19,10 +19,6 @@ async function loadHistory(container) {
     container.innerHTML = `
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h1 class="text-gradient font-bold text-xl md:text-2xl">Riwayat Tontonan</h1>
-        <button class="btn-secondary flex items-center gap-2 self-start sm:self-auto" id="clearHistory">
-          <i class="fas fa-trash"></i>
-          Hapus Semua
-        </button>
       </div>
 
       <div id="historyList" class="space-y-4">
@@ -56,15 +52,6 @@ async function loadHistory(container) {
       `;
 
       historyList.appendChild(historyItem);
-    });
-
-    // Event listener for clear all history
-    document.getElementById("clearHistory").addEventListener("click", async () => {
-      if (confirm("Apakah Anda yakin ingin menghapus semua riwayat tontonan?")) {
-        // Clear all history from storage
-        localStorage.removeItem("watchHistory");
-        loadHistory(container);
-      }
     });
 
     // Event listeners for remove individual items
