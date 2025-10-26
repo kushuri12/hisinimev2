@@ -17,7 +17,7 @@ async function loadHistory(container) {
     }
 
     container.innerHTML = `
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center text-center sm:justify-between mb-6 gap-4">
         <h1 class="text-gradient font-bold text-xl md:text-2xl">Riwayat Tontonan</h1>
       </div>
 
@@ -82,7 +82,7 @@ export function history() {
   }, 0);
 
   return `
-  <div class="pt-20 md:pt-24 p-4">
+  <div class="p-4">
     <div id="container" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-center h-64">
         <div class="text-center">
