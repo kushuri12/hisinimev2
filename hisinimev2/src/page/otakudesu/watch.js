@@ -13,12 +13,6 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
 
     container.innerHTML = `
       <a class="bg-transparent backdrop-blur-sm text-center px-3 py-2 mr-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="backto"><i class="fas fa-arrow-left"></i></a>
-      <h1 class="mt-5 font-bold text-xl text-center mb-4 text-white">${data.data.episode}</h1>
-
-      <div class="flex justify-between mt-3 w-full">
-        <a class="bg-gray-700 text-center p-2 mr-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="backeps"><< Sebelumnya</a>
-        <a class="bg-gray-700 text-center p-2 ml-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="nexteps">Selanjutnya >></a>
-      </div>
 
       <iframe id="player" class="w-full aspect-video mt-4 rounded shadow" src="" frameborder="0" allowfullscreen></iframe>
 
@@ -34,12 +28,20 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
         </div>
         <p id="savedTime" class="text-sm text-gray-300 mt-1"></p>
       </div>
+
+      <div class="mt-4 p-2 bg-gray-800 rounded">
+        <h1 class="font-bold text-lg text-start mb-4 text-white">${data.data.episode}</h1>
+          <div class="flex justify-end mt-3 w-full">
+            <a class="bg-gray-700 text-center p-2 mr-2 rounded-full w-[40px] h-[40px] text-purple-400 hover:bg-purple-600 transition" href="#" id="backeps"><i class="fa-solid fa-chevron-left"></i></a>
+            <a class="bg-gray-700 text-center p-2 ml-2 rounded-full w-[40px] h-[40px] text-purple-400 hover:bg-purple-600 transition" href="#" id="nexteps"><i class="fa-solid fa-chevron-right"></i></a>
+          </div>
+      </div>
     `;
 
     // Tombol navigasi
     document.getElementById("backto").addEventListener("click", (e) => {
       e.preventDefault();
-      navigateTo(`/`);
+      window.history.back();
     });
 
     document.getElementById("nexteps").addEventListener("click", (e) => {

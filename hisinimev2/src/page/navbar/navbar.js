@@ -45,6 +45,9 @@ const user = getCurrentUser();
             <button class="hover:text-blue-500 transition-all duration-500" onclick='navigateTo("/dashboard")'>
                 <i class="fa-solid fa-user"></i>
             </button>
+            <button class="hover:text-red-500 transition-all duration-500" onclick='navigateTo("/explore")'>
+                <i class="fa-solid fa-compass"></i>
+            </button>
             <button class="hover:text-purple-500 transition-all duration-500" onclick='navigateTo("/")'>
                 <i class="fa-solid fa-house"></i>
             </button>
@@ -54,11 +57,11 @@ const user = getCurrentUser();
         `;
   } else {
     navBlock.innerHTML = `
+            <button class="hover:text-red-500 transition-all duration-500" onclick='navigateTo("/explore")'>
+                <i class="fa-solid fa-compass"></i>
+            </button>
             <button class="hover:text-purple-500 transition-all duration-500" onclick='navigateTo("/")'>
                 <i class="fa-solid fa-house"></i>
-            </button>
-            <button class="hover:text-yellow-500 transition-all duration-500" onclick='navigateTo("/favorite")'>
-                <i class="fa-solid fa-bookmark"></i>
             </button>
         `;
   }

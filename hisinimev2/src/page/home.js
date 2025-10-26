@@ -280,16 +280,6 @@ function createHomeBoth() {
   };
 }
 
-function updateAuthUI(user) {
-  const authSection = document.getElementById("auth-section");
-  if (user) {
-    authSection.innerHTML = `
-      <span class="text-white">Welcome, ${user.displayName || user.email}</span>
-    `;
-  }
-
-}
-
 export const homeOtakuDesu = createHomePage("OtakuDesu");
 export const homeSamehadaku = createHomePage("Samehadaku");
 export const homeBoth = createHomeBoth();

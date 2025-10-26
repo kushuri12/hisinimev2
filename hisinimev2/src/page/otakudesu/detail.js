@@ -27,7 +27,7 @@ async function getDetailAnime(id, container) {
     const isFavorited = favs.some(fav => (typeof fav === 'string' ? fav == id : fav.id == id && fav.source == data.source));
 
     container.innerHTML = `
-    <a class="absolute left-2 top-4 bg-transparent backdrop-blur-sm text-center text-xl p-2 rounded text-purple-400 hover:bg-purple-600 transition fas fa-arrow-left" href="#" id="backto"></a>
+    <a class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition fas fa-arrow-left" href="#" id="backto"></a>
       <img src="${anime.poster}" alt="${
       anime.title
     }" class="object-cover w-[30vh] md:w-[50vh] rounded-md mb-5 md:mb-0 mx-auto md:mx-0 md:mr-5"/>

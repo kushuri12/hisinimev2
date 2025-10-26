@@ -30,7 +30,7 @@ function createDashboardPage() {
     return `
       <div class="nav-bar w-screen p-4">
         <div class="flex flex-col items-center gap-4 max-w-4xl mx-auto">
-          <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">Dashboard - HisiNime v2</h1>
+          <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">Profil</h1>
 
           <div class="flex items-center gap-2 mb-4">
             <span class="text-white">Halo, ${

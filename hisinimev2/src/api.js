@@ -61,6 +61,14 @@ const endpointMapping = {
   "server": {
     "OtakuDesu": "undefined",
     "Samehadaku": "server"
+  },
+  "genre": {
+    "OtakuDesu": "genre",
+    "Samehadaku": "genres"
+  },
+  "allanime": {
+    "OtakuDesu": "unlimited",
+    "Samehadaku": "list"
   }
 };
 

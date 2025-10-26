@@ -27,12 +27,12 @@ async function getDetailAnime(id, container) {
     const isFavorited = favs.some(fav => (typeof fav === 'string' ? fav === id : fav.id === id && fav.source == data.source));
 
     container.innerHTML = `
-    <a class="absolute left-2 top-4 bg-transparent backdrop-blur-sm text-center text-xl p-2 rounded text-purple-400 hover:bg-purple-600 transition fas fa-arrow-left" href="#" id="backto"></a>
+    <a class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition fas fa-arrow-left" href="#" id="backto"></a>
       <img src="${anime.poster}" alt="${
       anime.title || "tidak diketahui"
     }" class="object-cover w-[30vh] md:w-[50vh] rounded-md mb-5 md:mb-0 mx-auto md:mx-0 md:mr-5"/>
       <div class="flex flex-col flex-grow">
-        <h1 class="font-bold text-md text-white">${anime.title || anime.english}</h1>
+        <h1 class="font-bold text-md text-white">${anime.title || anime.english || anime.synonyms}</h1>
         <span class="text-xs text-gray-400">From ${data.source}</span>
          <button id="favoriteBtn" class="mt-2 px-3 py-1 w-[130px] rounded text-sm ${
            isFavorited ? "bg-red-600 text-white" : "bg-purple-600 text-white"

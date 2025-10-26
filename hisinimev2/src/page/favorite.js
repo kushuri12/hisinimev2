@@ -5,23 +5,10 @@ function createFavoriteBoth() {
     setTimeout(async () => {
       const container = document.getElementById("favorites");
       await renderFavoritesBoth(container, navigateTo);
-      document.title = "Favorite - Combined Mode";
-
-      // tombol kembali
-      document.getElementById("backto").addEventListener("click", (e) => {
-        e.preventDefault();
-        window.history.back();
-      });
+      document.title = "Favorite";
     }, 0);
 
     return `
-      <div class="w-full flex justify-start p-4 bg-gray-900 shadow-sm z-10">
-        <a
-          href=""
-          id="backto"
-          class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"
-        ><i class="fas fa-arrow-left"></i></a>
-      </div>
       <div id="favorites" class="mt-3 rounded shadow flex flex-col items-center p-5 w-full md:w-[100vh] bg-gray-900">
         <p class="text-gray-300 text-center">Sedang memuat favorit...</p>
       </div>
@@ -31,7 +18,7 @@ function createFavoriteBoth() {
 
 async function renderFavoritesBoth(container, navigateTo) {
   // Bersihkan container
-  container.innerHTML = '<h2 class="text-xl text-purple-300 font-bold mb-4">Daftar Favorit</h2>';
+  container.innerHTML = '<h1 class="text-gradient font-bold text-xl md:text-2xl text-center mb-5">Favorite</h1>';
 
   const favs = await getFavorites();
 

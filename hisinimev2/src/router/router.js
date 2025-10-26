@@ -3,6 +3,7 @@ import { homeOtakuDesu, homeSamehadaku, homeBoth } from '../page/home.js';
 import { favoriteBoth } from '../page/favorite.js';
 import { searchBoth } from '../page/search.js';
 import { dashboard } from '../page/dashboard.js';
+import { explore } from '../page/explore.js';
 
 // OtakuDesu pages
 import { detail as otakudesuDetail } from '../page/otakudesu/detail.js';
@@ -21,6 +22,7 @@ const routes = {
     "/favorite": favoriteBoth,
     "/search": searchBoth,
     "/dashboard": dashboard,
+    "/explore": explore,
     // OtakuDesu routes
     "/anime/otakudesu": homeOtakuDesu,
     "/anime/otakudesu/detail": otakudesuDetail,
