@@ -17,7 +17,12 @@ async function getDetailAnime(id, container) {
     const data = await fetchFromSource("Samehadaku", `anime/${id}`);
 
     if (!data.data) {
-      container.innerText = "Detail anime tidak tersedia.";
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-64 text-center">
+          <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+          <p class="text-gray-300">Detail anime tidak tersedia.</p>
+        </div>
+      `;
       return;
     }
 
@@ -27,42 +32,107 @@ async function getDetailAnime(id, container) {
     const isFavorited = favs.some(fav => (typeof fav === 'string' ? fav === id : fav.id === id && fav.source == data.source));
 
     container.innerHTML = `
-    <a class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition fas fa-arrow-left" href="#" id="backto"></a>
-      <img src="${anime.poster}" alt="${
-      anime.title || "tidak diketahui"
-    }" class="object-cover w-[30vh] md:w-[50vh] rounded-md mb-5 md:mb-0 mx-auto md:mx-0 md:mr-5"/>
-      <div class="flex flex-col flex-grow">
-        <h1 class="font-bold text-md text-white">${anime.title || anime.english || anime.synonyms}</h1>
-        <span class="text-xs text-gray-400">From ${data.source}</span>
-         <button id="favoriteBtn" class="mt-2 px-3 py-1 w-[130px] rounded text-sm ${
-           isFavorited ? "bg-red-600 text-white" : "bg-purple-600 text-white"
-         } hover:opacity-80 transition">
-          ${isFavorited ? "Hapus Favorit" : "Tambah Favorit"}
+      <!-- Header Section -->
+      <div class="flex items-center justify-between mb-6 pt-16 md:pt-6">
+        <button class="btn-secondary flex items-center gap-2 z-10 relative" id="backto">
+          <i class="fas fa-arrow-left"></i>
+          <span class="hidden sm:inline">Kembali</span>
         </button>
-        <div class="mt-4 text-justify text-sm leading-relaxed max-w-full md:max-w-[600px] font-semibold text-white">
-  <p id="synopsis">Sinopsis:
-    <span class="font-normal text-gray-300">${anime.synopsis?.paragraphs ? (Array.isArray(anime.synopsis.paragraphs) ? anime.synopsis.paragraphs.join(' ') : anime.synopsis.paragraphs) : anime.synopsis || 'Tidak ada sinopsis'}</span>
-  </p>
-  <button id="readMoreBtn" class="text-purple-400 hover:underline">Selengkapnya</button>
-</div>
-
-        <div class="bg-gray-700 p-2 mt-2 mb-2">
-          <p class="text-xs text-white mb-1">Japanese: ${
-            anime.japanese
-          }</p>
-          <p class="text-xs text-white mb-1">Status: ${anime.status}</p>
-          <p class="text-xs text-white mb-1">Episode: ${anime.episodes}</p>
-          <p class="text-xs text-white mb-1">Skor: ${anime.score?.value || "N/A"}</p>
-          <p class="text-xs text-white mb-1">Studio: ${anime.studios}</p>
-          <p class="text-xs text-white mb-1">Tipe: ${anime.type}</p>
-          <p class="text-xs text-white">Durasi: ${anime.duration}</p>
-          <p class="text-xs text-white">Rilis: ${anime.aired}</p>
+        <div class="text-center flex-1">
+          <h1 class="text-gradient font-bold text-xl md:text-2xl">${anime.title || anime.english || anime.synonyms}</h1>
+          <p class="text-sm text-purple-400 font-semibold">Samehadaku</p>
         </div>
-        <div class="flex flex-wrap gap-2">
-          Genre: ${anime.genreList?.map(
-              (g) =>
-                `<span class="bg-purple-700 text-purple-200 text-xs px-2 py-1 rounded">${g.title}</span>`
-            ).join("") || "Tidak ada genre"}
+        <div class="w-20"></div> <!-- Spacer for centering -->
+      </div>
+
+      <!-- Main Content -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- Poster Section -->
+        <div class="md:col-span-1">
+          <div class="card p-4">
+            <img src="${anime.poster}" alt="${anime.title || "tidak diketahui"}" class="w-full rounded-lg shadow-lg mb-4"/>
+            <button id="favoriteBtn" class="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r ${isFavorited ? 'from-red-500 to-pink-500' : 'from-purple-500 to-purple-600'} p-4 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]">
+              <div class="flex items-center justify-center gap-3">
+                <div class="relative">
+                  <i class="fas fa-heart text-2xl transition-all duration-300 ${isFavorited ? 'scale-110 text-red-200' : 'group-hover:scale-110'}"></i>
+                  ${isFavorited ? '<div class="absolute inset-0 animate-ping rounded-full bg-red-300 opacity-20"></div>' : ''}
+                </div>
+                <div class="flex flex-col items-start">
+                  <span class="font-semibold text-lg">${isFavorited ? "Favorit" : "Tambah ke"}</span>
+                  <span class="text-sm opacity-90">${isFavorited ? "Hapus dari favorit" : "Daftar Favorit"}</span>
+                </div>
+              </div>
+              <div class="absolute inset-0 bg-white opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Details Section -->
+        <div class="md:col-span-2 space-y-4">
+          <!-- Synopsis Card -->
+          <div class="card p-4">
+            <h3 class="font-semibold text-purple-300 mb-3 flex items-center gap-2">
+              <i class="fas fa-book"></i>
+              Sinopsis
+            </h3>
+            <div class="text-justify text-sm leading-relaxed text-gray-300">
+              <p id="synopsis">${anime.synopsis?.paragraphs ? (Array.isArray(anime.synopsis.paragraphs) ? anime.synopsis.paragraphs.join(' ') : anime.synopsis.paragraphs) : anime.synopsis || 'Tidak ada sinopsis'}</p>
+              <button id="readMoreBtn" class="text-purple-400 hover:underline text-sm mt-2">Selengkapnya</button>
+            </div>
+          </div>
+
+          <!-- Info Card -->
+          <div class="card p-4">
+            <h3 class="font-semibold text-purple-300 mb-3 flex items-center gap-2">
+              <i class="fas fa-info-circle"></i>
+              Informasi Anime
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Japanese:</span>
+                <span class="text-white">${anime.japanese || 'N/A'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Status:</span>
+                <span class="text-white">${anime.status || 'N/A'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Episode:</span>
+                <span class="text-white">${anime.episodes || 'N/A'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Skor:</span>
+                <span class="text-white">${anime.score?.value || "N/A"}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Studio:</span>
+                <span class="text-white">${anime.studios || 'N/A'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Tipe:</span>
+                <span class="text-white">${anime.type || 'N/A'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Durasi:</span>
+                <span class="text-white">${anime.duration || 'N/A'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Rilis:</span>
+                <span class="text-white">${anime.aired || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Genres Card -->
+          <div class="card p-4">
+            <h3 class="font-semibold text-purple-300 mb-3 flex items-center gap-2">
+              <i class="fas fa-tags"></i>
+              Genre
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              ${anime.genreList?.map(g => `<span class="badge">${g.title}</span>`).join("") || '<span class="text-gray-400">Tidak ada genre</span>'}
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -94,14 +164,37 @@ async function getDetailAnime(id, container) {
       const isFavorited = favs.some(fav => fav.id === id && fav.source === "Samehadaku");
       if (isFavorited) {
         await removeFavorite(id, "Samehadaku");
-        btn.textContent = "Tambah Favorit";
-        btn.className =
-          "mt-2 px-3 py-1 w-[130px] rounded text-sm bg-purple-600 text-white hover:opacity-80 transition";
+        // Update button to "Add to Favorites" state
+        btn.innerHTML = `
+          <div class="flex items-center justify-center gap-3">
+            <div class="relative">
+              <i class="fas fa-heart text-2xl transition-all duration-300 group-hover:scale-110"></i>
+            </div>
+            <div class="flex flex-col items-start">
+              <span class="font-semibold text-lg">Tambah ke</span>
+              <span class="text-sm opacity-90">Daftar Favorit</span>
+            </div>
+          </div>
+          <div class="absolute inset-0 bg-white opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+        `;
+        btn.className = "group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 p-4 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]";
       } else {
         await addFavorite(id, "Samehadaku", anime.title, anime.poster);
-        btn.textContent = "Hapus Favorit";
-        btn.className =
-          "mt-2 px-3 py-1 w-[130px] rounded text-sm bg-red-600 text-white hover:opacity-80 transition";
+        // Update button to "Remove from Favorites" state
+        btn.innerHTML = `
+          <div class="flex items-center justify-center gap-3">
+            <div class="relative">
+              <i class="fas fa-heart text-2xl transition-all duration-300 scale-110 text-red-200"></i>
+              <div class="absolute inset-0 animate-ping rounded-full bg-red-300 opacity-20"></div>
+            </div>
+            <div class="flex flex-col items-start">
+              <span class="font-semibold text-lg">Favorit</span>
+              <span class="text-sm opacity-90">Hapus dari favorit</span>
+            </div>
+          </div>
+          <div class="absolute inset-0 bg-white opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+        `;
+        btn.className = "group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-red-500 to-pink-500 p-4 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]";
       }
     });
   } catch (err) {
@@ -130,7 +223,7 @@ async function getEpisodes(animeId, container) {
         (ep) => `
       <a
   href="/anime/samehadaku/watch?id=${ep.episodeId}"
-  class="flex items-center justify-between bg-gray-800 text-purple-200 text-sm md:text-base px-3 py-2 rounded hover:bg-purple-700 transition"
+  class="flex items-center justify-between bg-gray-800 text-purple-300 text-sm md:text-base px-3 py-2 rounded hover:bg-purple-700 transition"
   data-episode="${ep.episodeId}"
 >
   <div class="flex items-center">
@@ -186,9 +279,21 @@ export function detail() {
 
   // Kembalikan HTML placeholder
   return `
-  <div class="flex flex-col md:flex-row w-screen">
-  <div id="information" class="w-screen bg-gray-900 p-4">Sedang memuat konten...</div>
-  <div id="episode" class="w-screen bg-gray-900 p-4">Sedang memuat konten...</div>
+  <div class="flex flex-col mt-[-50px] md:mt-5 md:flex-row w-screen">
+  <div id="information" class="w-screen bg-gray-900 p-4">
+    <div class="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+      <p class="text-gray-300 text-lg font-medium">Memuat detail anime...</p>
+      <p class="text-gray-400 text-sm">Mohon tunggu sebentar</p>
+    </div>
+  </div>
+  <div id="episode" class="w-screen bg-gray-900 p-4">
+    <div class="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+      <p class="text-gray-300 text-lg font-medium">Memuat daftar episode...</p>
+      <p class="text-gray-400 text-sm">Mohon tunggu sebentar</p>
+    </div>
+  </div>
 </div>
   `;
 }

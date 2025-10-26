@@ -6,35 +6,90 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
   try {
     const result = await fetchFromSource("OtakuDesu", `episode/${episodeId}`);
     if (!result.data) {
-      container.innerText = "Streaming anime tidak tersedia.";
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-64 text-center">
+          <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+          <p class="text-gray-300">Streaming anime tidak tersedia.</p>
+        </div>
+      `;
       return;
     }
     const data = result.data;
 
     container.innerHTML = `
-      <a class="bg-transparent backdrop-blur-sm text-center px-3 py-2 mr-2 rounded text-purple-300 hover:bg-purple-600 transition" href="#" id="backto"><i class="fas fa-arrow-left"></i></a>
-
-      <iframe id="player" class="w-full aspect-video mt-4 rounded shadow" src="" frameborder="0" allowfullscreen></iframe>
-
-      <div id="servers" class="mt-3 flex flex-wrap gap-2 text-purple-300 font-semibold">Server Tambahan: </div>
-
-      <!-- Fitur Bookmark Waktu -->
-      <div class="mt-4 p-2 bg-gray-800 rounded">
-        <h3 class="font-semibold text-purple-300 mb-2">Bookmark Waktu (per Episode)</h3>
-        <div class="flex gap-2 items-center">
-          <label class="text-gray-300">Menit: <input type="number" id="minutes" min="0" class="w-16 px-2 py-1 border rounded bg-gray-700 text-white" /></label>
-          <label class="text-gray-300">Detik: <input type="number" id="seconds" min="0" max="59" class="w-16 px-2 py-1 border rounded bg-gray-700 text-white" /></label>
-          <button id="saveTime" class="px-4 py-1 bg-purple-500 text-white rounded hover:bg-purple-600">Simpan</button>
+      <!-- Header Section -->
+      <div class="flex items-center justify-between mb-6">
+        <button class="btn-secondary flex items-center gap-2" id="backto">
+          <i class="fas fa-arrow-left"></i>
+          <span class="hidden sm:inline">Kembali</span>
+        </button>
+        <div class="text-center flex-1">
+          <h1 class="text-gradient font-bold text-lg md:text-xl">${data.data.episode}</h1>
+          <p class="text-sm text-blue-400 font-semibold">OtakuDesu</p>
         </div>
-        <p id="savedTime" class="text-sm text-gray-300 mt-1"></p>
+        <div class="w-20"></div> <!-- Spacer for centering -->
       </div>
 
-      <div class="mt-4 p-2 bg-gray-800 rounded">
-        <h1 class="font-bold text-lg text-start mb-4 text-white">${data.data.episode}</h1>
-          <div class="flex justify-end mt-3 w-full">
-            <a class="bg-gray-700 text-center p-2 mr-2 rounded-full w-[40px] h-[40px] text-purple-400 hover:bg-purple-600 transition" href="#" id="backeps"><i class="fa-solid fa-chevron-left"></i></a>
-            <a class="bg-gray-700 text-center p-2 ml-2 rounded-full w-[40px] h-[40px] text-purple-400 hover:bg-purple-600 transition" href="#" id="nexteps"><i class="fa-solid fa-chevron-right"></i></a>
+      <!-- Video Player Section -->
+      <div class="card p-4 mb-6">
+        <iframe id="player" class="w-full aspect-video rounded-lg shadow-lg" src="" frameborder="0" allowfullscreen></iframe>
+      </div>
+
+      <!-- Server Selection -->
+      <div class="card p-4 mb-6">
+        <h3 class="font-semibold text-purple-300 mb-3 flex items-center gap-2">
+          <i class="fas fa-server"></i>
+          Server Streaming
+        </h3>
+        <div id="servers" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Episode Navigation -->
+      <div class="card p-4 mb-6">
+        <h3 class="font-semibold text-purple-300 mb-3 flex items-center gap-2">
+          <i class="fas fa-list"></i>
+          Navigasi Episode
+        </h3>
+        <div class="flex items-center justify-center gap-4">
+          <button class="btn-secondary flex items-center gap-2 px-4 py-2 ${!data.data.previous_episode ? 'opacity-50 cursor-not-allowed' : ''}" id="backeps" ${!data.data.previous_episode ? 'disabled' : ''}>
+            <i class="fas fa-chevron-left"></i>
+            <span class="hidden sm:inline">Episode Sebelumnya</span>
+          </button>
+          <div class="text-center px-4">
+            <p class="text-white font-medium">${data.data.episode}</p>
+            <p class="text-sm text-gray-400">dari ${data.data.anime_title || 'Anime'}</p>
           </div>
+          <button class="btn-secondary flex items-center gap-2 px-4 py-2 ${!data.data.next_episode ? 'opacity-50 cursor-not-allowed' : ''}" id="nexteps" ${!data.data.next_episode ? 'disabled' : ''}>
+            <span class="hidden sm:inline">Episode Selanjutnya</span>
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bookmark Time Feature -->
+      <div class="card p-4">
+        <h3 class="font-semibold text-purple-300 mb-3 flex items-center gap-2">
+          <i class="fas fa-bookmark"></i>
+          Bookmark Waktu
+        </h3>
+        <p class="text-sm text-gray-400 mb-3">Simpan waktu tonton untuk melanjutkan nanti</p>
+        <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <div class="flex gap-2">
+            <div class="flex flex-col">
+              <label class="text-xs text-gray-400 mb-1">Menit</label>
+              <input type="number" id="minutes" min="0" class="input-modern w-16 text-center" />
+            </div>
+            <div class="flex flex-col">
+              <label class="text-xs text-gray-400 mb-1">Detik</label>
+              <input type="number" id="seconds" min="0" max="59" class="input-modern w-16 text-center" />
+            </div>
+          </div>
+          <button id="saveTime" class="btn-primary flex items-center gap-2 px-4 py-2">
+            <i class="fas fa-save"></i>
+            Simpan
+          </button>
+        </div>
+        <p id="savedTime" class="text-sm text-gray-400 mt-2"></p>
       </div>
     `;
 
@@ -232,9 +287,23 @@ export function watch() {
   }, 0);
 
   return `
-  <div class="flex flex-col md:flex-row md:m-2 gap-2  ">
-    <div id="container" class="bg-gray-900 w-screen md:w-[100vh] rounded p-3">Sedang memuat konten...</div>
-    <div id="rekomen" class="bg-gray-900 w-screen md:w-[100vh] rounded p-3">Sedang memuat konten...</div>
+  <div class="flex flex-col md:flex-row md:m-2 gap-2 pt-20 md:pt-24">
+    <div id="container" class="bg-gray-900 w-screen md:w-[100vh] rounded p-3">
+      <div class="flex items-center justify-center h-64">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+          <p class="text-purple-300 font-medium">Memuat konten streaming...</p>
+        </div>
+      </div>
+    </div>
+    <div id="rekomen" class="bg-gray-900 w-screen md:w-[100vh] rounded p-3">
+      <div class="flex items-center justify-center h-64">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+          <p class="text-purple-300 font-medium">Memuat rekomendasi...</p>
+        </div>
+      </div>
+    </div>
   </div>
   `;
 }

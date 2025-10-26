@@ -137,6 +137,23 @@ body {
   max-width: 200px;
 }
 
+/* Badge styles for genres */
+.badge {
+  background: linear-gradient(135deg, #a855f7 0%, #667eea 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+}
+
 /* Responsive Grid Utilities */
 .grid-responsive {
   display: grid;
