@@ -63,6 +63,10 @@ function updateNavbar() {
                 <i class="fa-solid fa-bookmark"></i>
                 <span class="hidden md:inline">Favorite</span>
             </button>
+            <button class="hover:text-green-500 transition-all duration-500 flex items-center gap-2" onclick='navigateTo("/history")' aria-label="History">
+                <i class="fa-solid fa-history"></i>
+                <span class="hidden md:inline">History</span>
+            </button>
           </div>
           <div class="flex items-center gap-4">
             <span class="text-sm text-gray-300">Welcome, ${user.displayName || user.email}</span>
@@ -89,6 +93,10 @@ function updateNavbar() {
           <button class="hover:text-yellow-500 transition-all duration-500 flex flex-col items-center gap-1" onclick='navigateTo("/favorite")' aria-label="Favorite">
               <i class="fa-solid fa-bookmark text-lg"></i>
               <span class="text-xs">Favorite</span>
+          </button>
+          <button class="hover:text-green-500 transition-all duration-500 flex flex-col items-center gap-1" onclick='navigateTo("/history")' aria-label="History">
+              <i class="fa-solid fa-history text-lg"></i>
+              <span class="text-xs">History</span>
           </button>
         </div>
       `;

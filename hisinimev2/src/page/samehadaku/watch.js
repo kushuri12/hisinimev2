@@ -1,6 +1,6 @@
 import { navigateTo } from "../../router/router.js";
 import { fetchFromSource } from '../../api.js';
-import { getBookmarkTime, saveBookmarkTime, getPreferredResolution, savePreferredResolution } from '../../storage/storage.js';
+import { getBookmarkTime, saveBookmarkTime, getPreferredResolution, savePreferredResolution, saveHistory } from '../../storage/storage.js';
 
 const API = "https://www.sankavollerei.com/anime/";
 
@@ -26,8 +26,8 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
           <span class="hidden sm:inline">Kembali</span>
         </button>
         <div class="text-center flex-1">
-          <h1 class="text-gradient font-bold text-lg md:text-xl">${data.title}</h1>
-          <p class="text-sm text-purple-400 font-semibold">Samehadaku</p>
+          <h1 class="text-gradient font-bold text-xl md:text-2xl leading-tight">${data.animeTitle || 'Anime'} - ${data.title}</h1>
+          <p class="text-sm text-purple-400 font-semibold mt-1">Streaming dari Samehadaku</p>
         </div>
         <div class="w-20"></div> <!-- Spacer for centering -->
       </div>
@@ -127,6 +127,9 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
     });
 
     renderQualities(data.server.qualities);
+
+    // Save to history
+    await saveHistory(animeId, episodeId, data.title || 'Anime', data.animeId, 'Samehadaku', data.poster || '');
 
     // Load rekomendasi anime
     rekomenAnime(rekomen);
@@ -314,7 +317,7 @@ export function watch() {
   }, 0);
 
   return `
-  <div class="flex flex-col md:flex-row md:m-2 gap-2 pt-20 md:pt-24">
+  <div class="flex flex-col md:flex-row gap-2">
     <div id="container" class="bg-gray-900 w-screen md:w-[100vh] rounded p-3">
       <div class="flex items-center justify-center h-64">
         <div class="text-center">

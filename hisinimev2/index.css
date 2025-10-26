@@ -303,6 +303,16 @@ a:focus {
   }
 }
 
+.has-top-nav {
+  padding-top: 0;
+}
+
+@media (min-width: 1024px) {
+  .has-top-nav {
+    padding-top: 80px;
+  }
+}
+
 @media (min-width: 1024px) {
   .nav-bar-top {
     padding: 1.5rem;

@@ -33,7 +33,7 @@ async function getDetailAnime(id, container) {
 
     container.innerHTML = `
       <!-- Header Section -->
-      <div class="flex items-center justify-between mb-6 pt-16 md:pt-6">
+      <div class="flex items-center justify-between mb-6 md:pt-6">
         <button class="btn-secondary flex items-center gap-2 z-10 relative" id="backto">
           <i class="fas fa-arrow-left"></i>
           <span class="hidden sm:inline">Kembali</span>
@@ -279,7 +279,7 @@ export function detail() {
 
   // Kembalikan HTML placeholder
   return `
-  <div class="flex flex-col mt-[-50px] md:mt-5 md:flex-row w-screen">
+  <div class="flex flex-col md:flex-row w-screen">
   <div id="information" class="w-screen bg-gray-900 p-4">
     <div class="flex flex-col items-center justify-center min-h-[400px] space-y-4">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>

@@ -4,6 +4,7 @@ import { favoriteBoth } from '../page/favorite.js';
 import { searchBoth } from '../page/search.js';
 import { dashboard } from '../page/dashboard.js';
 import { explore } from '../page/explore.js';
+import { history } from '../page/history/history.js';
 
 // OtakuDesu pages
 import { detail as otakudesuDetail } from '../page/otakudesu/detail.js';
@@ -23,6 +24,7 @@ const routes = {
     "/search": searchBoth,
     "/dashboard": dashboard,
     "/explore": explore,
+    "/history": history,
     // OtakuDesu routes
     "/anime/otakudesu": homeOtakuDesu,
     "/anime/otakudesu/detail": otakudesuDetail,
@@ -34,7 +36,7 @@ const routes = {
 };
 
 export function navigateTo(path) {
-    history.pushState({}, "", path);
+    window.history.pushState({}, "", path);
     handleRoute();
 }
 

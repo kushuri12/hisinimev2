@@ -5,3 +5,8 @@
 - [x] Edit kembali button in samehadaku/watch.js
 - [x] Edit kembali button in otakudesu/watch.js
 - [x] Edit kembali button in favorite.js
+- [x] Add history storage functions to storage.js (getHistory, saveHistory, removeHistory)
+- [x] Modify samehadaku/watch.js to save history on episode load
+- [x] Modify otakudesu/watch.js to save history on episode load
+- [x] Implement history.js to display watch history list
+- [x] Update navbar to include history link if not present

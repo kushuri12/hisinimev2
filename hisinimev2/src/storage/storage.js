@@ -1,5 +1,5 @@
 import { db } from '../firebase.js';
-import { doc, getDoc, setDoc, collection, addDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, addDoc, query, where, getDocs, deleteDoc, orderBy } from 'firebase/firestore';
 import { getCurrentUser } from '../auth.js';
 
 // Favorites are saved to Firestore if user is logged in, otherwise not saved
@@ -242,3 +242,106 @@ export async function saveLastResolutionToFirestore(uid, animeId, resolution) {
     console.error('Error saving last resolution to Firestore:', error);
   }
 }
+
+// History functions
+export async function getHistory() {
+  const user = getCurrentUser();
+  if (user) {
+    return getHistoryFromFirestore(user.uid);
+  } else {
+    return JSON.parse(localStorage.getItem('watchHistory') || '[]');
+  }
+}
+
+export async function saveHistory(animeId, episodeId, animeTitle, episodeTitle, source, poster) {
+  const user = getCurrentUser();
+  const historyItem = {
+    animeId,
+    episodeId,
+    animeTitle,
+    episodeTitle,
+    source,
+    poster,
+    timestamp: new Date().toISOString()
+  };
+
+  if (user) {
+    await saveHistoryToFirestore(user.uid, historyItem);
+  } else {
+    const history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+    // Remove existing entry for this episode if exists
+    const filtered = history.filter(h => !(h.animeId === animeId && h.episodeId === episodeId && h.source === source));
+    filtered.unshift(historyItem); // Add to beginning
+    // Keep only last 100 entries
+    if (filtered.length > 100) filtered.splice(100);
+    localStorage.setItem('watchHistory', JSON.stringify(filtered));
+  }
+}
+
+export async function removeHistory(index) {
+  const user = getCurrentUser();
+  if (user) {
+    const history = await getHistoryFromFirestore(user.uid);
+    if (history[index]) {
+      const item = history[index];
+      await removeHistoryFromFirestore(user.uid, item.animeId, item.episodeId, item.source);
+    }
+  } else {
+    const history = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+    history.splice(index, 1);
+    localStorage.setItem('watchHistory', JSON.stringify(history));
+  }
+}
+
+export async function getHistoryFromFirestore(uid) {
+  try {
+    const historyRef = collection(db, 'users', uid, 'history');
+    const q = query(historyRef, orderBy('timestamp', 'desc'));
+    const querySnapshot = await getDocs(q);
+    const history = [];
+    querySnapshot.forEach((doc) => {
+      history.push(doc.data());
+    });
+    return history;
+  } catch (error) {
+    console.error('Error getting history from Firestore:', error);
+    return [];
+  }
+}
+
+export async function saveHistoryToFirestore(uid, historyItem) {
+  try {
+    const historyRef = collection(db, 'users', uid, 'history');
+    // Check if entry already exists
+    const q = query(historyRef, where('animeId', '==', historyItem.animeId), where('episodeId', '==', historyItem.episodeId), where('source', '==', historyItem.source));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      // Update existing
+      const docId = querySnapshot.docs[0].id;
+      await setDoc(doc(db, 'users', uid, 'history', docId), historyItem);
+    } else {
+      // Add new
+      await addDoc(historyRef, historyItem);
+    }
+  } catch (error) {
+    console.error('Error saving history to Firestore:', error);
+  }
+}
+
+export async function removeHistoryFromFirestore(uid, animeId, episodeId, source) {
+  try {
+    if (!animeId || !episodeId || !source) {
+      console.error('Invalid parameters for removing history:', { animeId, episodeId, source });
+      return;
+    }
+    const historyRef = collection(db, 'users', uid, 'history');
+    const q = query(historyRef, where('animeId', '==', animeId), where('episodeId', '==', episodeId), where('source', '==', source));
+    const querySnapshot = await getDocs(q);
+    const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('Error removing history from Firestore:', error);
+  }
+}
+
+

@@ -1,6 +1,6 @@
 import { navigateTo } from "../../router/router.js";
 import { fetchFromSource } from '../../api.js';
-import { getBookmarkTime, saveBookmarkTime, getLastResolution, saveLastResolution } from '../../storage/storage.js';
+import { getBookmarkTime, saveBookmarkTime, getLastResolution, saveLastResolution, saveHistory } from '../../storage/storage.js';
 
 async function loadStreaming(animeId, episodeId, container, rekomen) {
   try {
@@ -24,8 +24,8 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
           <span class="hidden sm:inline">Kembali</span>
         </button>
         <div class="text-center flex-1">
-          <h1 class="text-gradient font-bold text-lg md:text-xl">${data.data.episode}</h1>
-          <p class="text-sm text-blue-400 font-semibold">OtakuDesu</p>
+          <h1 class="text-gradient font-bold text-xl md:text-2xl leading-tight">${data.data.anime_title || 'Anime'} - ${data.data.episode}</h1>
+          <p class="text-sm text-blue-400 font-semibold mt-1">Streaming dari OtakuDesu</p>
         </div>
         <div class="w-20"></div> <!-- Spacer for centering -->
       </div>
@@ -200,6 +200,9 @@ async function loadStreaming(animeId, episodeId, container, rekomen) {
       alert("Waktu berhasil disimpan!");
     });
 
+    // Save to history
+    await saveHistory(animeId, episodeId, data.data.episode || 'Anime', data.data.episode, 'OtakuDesu', data.data.poster || '');
+
     // Render rekomendasi anime acak
     rekomenAnime(rekomen);
   } catch (err) {
@@ -287,7 +290,7 @@ export function watch() {
   }, 0);
 
   return `
-  <div class="flex flex-col md:flex-row md:m-2 gap-2 pt-20 md:pt-24">
+  <div class="flex flex-col md:flex-row gap-2">
     <div id="container" class="bg-gray-900 w-screen md:w-[100vh] rounded p-3">
       <div class="flex items-center justify-center h-64">
         <div class="text-center">
