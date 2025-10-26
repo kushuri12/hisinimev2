@@ -10,7 +10,7 @@ function createFavoriteBoth() {
 
     return `
       <div id="favorites" class="mt-3 rounded shadow flex flex-col items-center p-5 w-full md:w-[100vh] bg-gray-900">
-        <p class="text-gray-300 text-center">Sedang memuat favorit...</p>
+        <div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div></div>
       </div>
     `;
   };

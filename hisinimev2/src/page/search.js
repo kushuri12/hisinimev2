@@ -28,19 +28,22 @@ function displaySearchCombined(animeList, targetId) {
   const grid = document.getElementById(targetId);
   grid.innerHTML = "";
 
+  // Use responsive grid instead of horizontal scroll
+  grid.className = "grid-responsive";
+
   animeList.forEach((anime) => {
     const source = anime.source;
     const card = document.createElement("div");
-    card.className = "min-w-[150px] max-w-[150px] bg-gray-800 rounded-lg shadow-md snap-start flex flex-col hover:shadow-lg transition-shadow relative";
+    card.className = "card flex flex-col relative cursor-pointer";
     const episodeBadge = source === "OtakuDesu" ? `<span class="absolute top-2 right-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[12px] px-3 py-1 font-semibold shadow-lg">Episode ${anime.episode_count !== undefined ? anime.episode_count : "?"}</span>` : `<span class="absolute top-2 right-2 rounded-full bg-gradient-to-r from-blue-500 to-green-500 text-white text-[12px] px-3 py-1 font-semibold shadow-lg">${anime.type || "N/A"}</span>`;
     const idKey = source === "OtakuDesu" ? "slug" : "animeId";
     const lastPart = anime[idKey].replace(/\/+$/, "").split("/").pop();
     const navPath = source === "OtakuDesu" ? `/anime/otakudesu/detail?id=${lastPart}` : `/anime/samehadaku/detail?id=${anime[idKey]}`;
     card.innerHTML = `
-      <img src="${anime.poster}" alt="${anime.title}" class="w-full h-auto rounded mb-3 object-cover" />
+      <img src="${anime.poster}" alt="${anime.title}" class="w-full h-48 object-cover rounded-t-lg" />
       ${episodeBadge}
-      <div class="flex flex-col items-start pl-3 pr-3">
-        <h3 class="font-bold text-white text-sm mb-1 line-clamp-2">${anime.title}</h3>
+      <div class="flex flex-col items-start p-4 flex-1">
+        <h3 class="font-bold text-sm mb-2 line-clamp-2 text-white">${anime.title}</h3>
         <span class="text-xs text-gray-400">From ${source}</span>
       </div>
     `;
@@ -93,7 +96,7 @@ function createSearchBoth() {
         <button onclick="window.history.back()" id="backto" class="bg-transparent backdrop-blur-sm text-purple-300 px-4 py-2 rounded font-semibold hover:bg-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
       </div>
       <div id="srch" class="flex flex-col items-center p-5 bg-gray-900 rounded shadow">
-        <p class="text-gray-300 text-center">Sedang memuat pencarian...</p>
+        <div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div></div>
       </div>
     `;
   };

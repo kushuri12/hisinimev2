@@ -57,11 +57,16 @@ function createAnimeCardHTML(anime) {
   if (!idValue) return ''; // Skip if no ID
   const lastPart = idValue.replace(/\/+$/, "").split("/").pop();
   const navPath = anime.source === "OtakuDesu" ? `/anime/otakudesu/detail?id=${lastPart}` : `/anime/samehadaku/detail?id=${idValue}`;
+  const episodeInfo = anime.episode_count ? `Episode ${anime.episode_count}` : (anime.type ? anime.type : '');
+  const badgeClass = anime.source === "OtakuDesu" ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gradient-to-r from-blue-500 to-green-500";
   return `
-    <div class="card h-20 w-full cursor-pointer bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition duration-300 shadow-lg hover:shadow-xl flex flex-row items-center gap-3" onclick="window.navigateTo('${navPath}')">
-      ${anime.poster ? `<img src="${anime.poster}" alt="${anime.title}" class="w-16 h-16 object-cover rounded">` : ''}
-      <div class="flex flex-col justify-center flex-1 min-w-0">
-        <h3 class="font-bold text-sm truncate text-white" title="${anime.title}">${anime.title}</h3>
+    <div class="card cursor-pointer bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl flex flex-col" onclick="window.navigateTo('${navPath}')" role="button" tabindex="0" aria-label="View details for ${anime.title}">
+      <div class="relative">
+        ${anime.poster ? `<img src="${anime.poster}" alt="${anime.title}" class="w-full h-32 object-cover rounded-lg mb-3">` : '<div class="w-full h-32 bg-gray-700 rounded-lg mb-3 flex items-center justify-center"><i class="fas fa-image text-gray-500 text-2xl"></i></div>'}
+        ${episodeInfo ? `<span class="absolute top-2 right-2 rounded-full ${badgeClass} text-white text-xs px-2 py-1 font-semibold shadow-lg">${episodeInfo}</span>` : ''}
+      </div>
+      <div class="flex flex-col flex-1">
+        <h3 class="font-bold text-sm mb-2 line-clamp-2 text-white" title="${anime.title}">${anime.title}</h3>
         <span class="text-xs text-gray-400">From ${anime.source}</span>
       </div>
     </div>
@@ -79,7 +84,7 @@ function displayPage(page, animeFolder) {
   const end = start + itemsPerPage;
   const pageAnime = allAnimeList.slice(start, end);
 
-  const gridHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">${pageAnime.map(createAnimeCardHTML).join('')}</div>`;
+  const gridHTML = `<div class="grid-responsive-2x2">${pageAnime.map(createAnimeCardHTML).join('')}</div>`;
   animeFolder.innerHTML = gridHTML;
 
   // Add pagination controls
@@ -144,7 +149,7 @@ async function loadGenreAnimePage(slug, source, page) {
 
 async function loadGenrePage(slug, page) {
   const animeFolder = document.getElementById("animeFolder");
-  animeFolder.innerHTML = "Sedang memuat anime...";
+  animeFolder.innerHTML = `<div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div></div>`;
 
   try {
     const [otakuResult, sameResult] = await Promise.all([
@@ -174,7 +179,7 @@ async function loadGenrePage(slug, page) {
 }
 
 function displayGenrePage(animeFolder, totalGenrePages) {
-  const gridHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">${allAnimeList.map(createAnimeCardHTML).join('')}</div>`;
+  const gridHTML = `<div class="grid-responsive-2x2">${allAnimeList.map(createAnimeCardHTML).join('')}</div>`;
   animeFolder.innerHTML = gridHTML;
 
   // Add pagination controls for genre pages
@@ -203,52 +208,87 @@ function displayGenrePage(animeFolder, totalGenrePages) {
 }
 
 async function loadGenres() {
+  const genreListContainer = document.getElementById("genreListContainer");
   const animeFolder = document.getElementById("animeFolder");
-  const otakuGenres = await fetchFromSource("OtakuDesu", "genre");
 
-  const genres = otakuGenres?.data?.data || [];
-  animeFolder.innerHTML = `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">${genres.map(genre => `<button class="btn-secondary rounded-md bg-gray-800 text-sm px-3 py-2 genre-btn" data-slug="${genre.slug}">${genre.name}</button>`).join('')}</div>`;
+  try {
+    const otakuGenres = await fetchFromSource("OtakuDesu", "genre");
+    const genres = otakuGenres?.data?.data || [];
 
-  // Add event listeners to genre buttons
-  document.querySelectorAll(".genre-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const slug = btn.getAttribute("data-slug");
-      currentGenreSlug = slug;
-      currentGenrePage = 1;
-      loadGenrePage(slug, 1);
+    genreListContainer.innerHTML = genres.map(genre => `<button class="btn-secondary w-full text-left text-sm px-3 py-2 genre-btn hover:bg-gray-700 transition-colors" data-slug="${genre.slug}">${genre.name}</button>`).join('');
+
+    // Add event listeners to genre buttons
+    document.querySelectorAll(".genre-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        // Remove active class from all buttons
+        document.querySelectorAll(".genre-btn").forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        btn.classList.add('active');
+        const slug = btn.getAttribute("data-slug");
+        currentGenreSlug = slug;
+        currentGenrePage = 1;
+        animeFolder.innerHTML = `<div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div></div>`;
+        loadGenrePage(slug, 1);
+      });
     });
-  });
+
+    // Show all anime initially in genre view
+    animeFolder.innerHTML = `<div class="text-center text-gray-400 py-8"><i class="fas fa-list text-4xl mb-4"></i><p>Select a genre to explore anime</p></div>`;
+  } catch (err) {
+    console.error("Failed to load genres:", err);
+    genreListContainer.innerHTML = `<p class="text-red-400 text-center">Failed to load genres</p>`;
+  }
 }
+
+let currentView = 'anime'; // 'anime' or 'genre'
 
 export function explore() {
   // Reset page state when navigating to explore
   currentPage = 1;
   allAnimeList = [];
+  currentView = 'anime';
 
   setTimeout(async () => {
     const animeFolder = document.getElementById("animeFolder");
+    const genreSidebar = document.getElementById("genreSidebar");
+    const animeListBtn = document.getElementById("animeList");
+    const genreListBtn = document.getElementById("genreList");
 
     // Load initial anime
     await loadAnime();
 
     if (allAnimeList.length === 0) {
-      animeFolder.innerHTML = `<p class="text-red-400 text-center">Gagal memuat anime.</p>`;
+      animeFolder.innerHTML = `<div class="flex items-center justify-center h-64"><div class="text-red-400 text-center"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Gagal memuat anime.</p></div></div>`;
     } else {
       displayPage(currentPage, animeFolder);
     }
 
-    document.getElementById("animeList").addEventListener("click", async () => {
+    // Event listeners
+    animeListBtn.addEventListener("click", async () => {
+      currentView = 'anime';
+      animeListBtn.classList.add('active');
+      genreListBtn.classList.remove('active');
+      genreSidebar.classList.add('hidden');
+      animeFolder.classList.remove('md:col-span-3');
+      animeFolder.classList.add('md:col-span-4');
       allAnimeList = [];
       currentPage = 1;
-      animeFolder.innerHTML = "Sedang memuat anime...";
+      animeFolder.innerHTML = `<div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div></div>`;
       await loadAnime();
       if (allAnimeList.length === 0) {
-        animeFolder.innerHTML = `<p class="text-red-400 text-center">Gagal memuat anime.</p>`;
+        animeFolder.innerHTML = `<div class="flex items-center justify-center h-64"><div class="text-red-400 text-center"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Gagal memuat anime.</p></div></div>`;
       } else {
         displayPage(currentPage, animeFolder);
       }
     });
-    document.getElementById("genreList").addEventListener("click", () => {
+
+    genreListBtn.addEventListener("click", () => {
+      currentView = 'genre';
+      genreListBtn.classList.add('active');
+      animeListBtn.classList.remove('active');
+      genreSidebar.classList.remove('hidden');
+      animeFolder.classList.remove('md:col-span-4');
+      animeFolder.classList.add('md:col-span-3');
       loadGenres();
     });
 
@@ -256,13 +296,34 @@ export function explore() {
 
   return `
   <div class="min-h-screen bg-gray-900 text-white">
-    <h1 class="text-gradient font-bold text-xl mt-3 p-5 md:text-2xl text-center mb-5">Explore Anime</h1>
-    <div class="flex justify-center gap-4 mb-6">
-      <button id="animeList" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 shadow-md">Anime</button>
-      <button id="genreList" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 shadow-md">Genre</button>
+    <div class="nav-bar w-screen p-4">
+      <div class="flex flex-col items-center gap-4 max-w-4xl mx-auto">
+        <h1 class="text-gradient font-bold text-xl md:text-2xl text-center">Explore Anime</h1>
+        <div class="flex gap-2">
+          <button id="animeList" class="btn-primary active">Anime</button>
+          <button id="genreList" class="btn-secondary">Genre</button>
+        </div>
+      </div>
     </div>
-    <div id="animeFolder" class="max-w-7xl mx-auto rounded-lg shadow-xl p-6 bg-gray-800 overflow-x-auto">
-      Sedang memuat anime...
+    <div class="content-section w-full max-w-7xl mx-auto p-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div id="genreSidebar" class="hidden md:block md:col-span-1 bg-gray-800 rounded-lg p-4">
+          <h3 class="text-lg font-semibold mb-4 text-gradient">Genres</h3>
+          <div id="genreListContainer" class="space-y-2">
+            <div class="animate-pulse flex space-x-4">
+              <div class="rounded bg-gray-700 h-8 flex-1"></div>
+            </div>
+            <div class="animate-pulse flex space-x-4">
+              <div class="rounded bg-gray-700 h-8 flex-1"></div>
+            </div>
+          </div>
+        </div>
+        <div id="animeFolder" class="md:col-span-3 bg-gray-800 rounded-lg p-6">
+          <div class="flex items-center justify-center h-64">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   `;
