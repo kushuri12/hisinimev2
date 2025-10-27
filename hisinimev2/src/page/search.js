@@ -6,7 +6,7 @@ async function search_combined(query, targetId) {
 
     // Search OtakuDesu
     const resultOtaku = await fetchFromSource("OtakuDesu", `search/${encodeURIComponent(query)}`);
-    const resultsOtaku = resultOtaku?.data?.search_results || [];
+    const resultsOtaku = resultOtaku?.data?.data?.search_results || [];
     results.push(...resultsOtaku.map(anime => ({ ...anime, source: "OtakuDesu" })));
 
     // Search Samehadaku
